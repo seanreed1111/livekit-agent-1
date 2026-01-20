@@ -1,5 +1,3 @@
-from loguru import logger
-
 from dotenv import load_dotenv
 from livekit import rtc
 from livekit.agents import (
@@ -14,8 +12,6 @@ from livekit.agents import (
 )
 from livekit.plugins import noise_cancellation, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
-
-
 
 load_dotenv(".env.local")
 
@@ -83,9 +79,7 @@ class VoiceAgentApp:
             llm=inference.LLM(model="openai/gpt-4.1-nano"),
             # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
             # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
-            tts=inference.TTS(
-                model="inworld/inworld-tts-1", voice="Ashley"
-            ),
+            tts=inference.TTS(model="inworld/inworld-tts-1", voice="Ashley"),
             # VAD and turn detection are used to determine when the user is speaking and when the agent should respond
             # See more at https://docs.livekit.io/agents/build/turns
             turn_detection=MultilingualModel(),
@@ -120,7 +114,8 @@ class VoiceAgentApp:
             room_options=room_io.RoomOptions(
                 audio_input=room_io.AudioInputOptions(
                     noise_cancellation=lambda params: noise_cancellation.BVCTelephony()
-                    if params.participant.kind == rtc.ParticipantKind.PARTICIPANT_KIND_SIP
+                    if params.participant.kind
+                    == rtc.ParticipantKind.PARTICIPANT_KIND_SIP
                     else noise_cancellation.BVC(),
                 ),
             ),
