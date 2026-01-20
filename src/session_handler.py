@@ -126,3 +126,6 @@ class SessionHandler:
         await ctx.connect()
 
         logger.info("Connected to room successfully")
+
+        # Greet the user when they join
+        await session.say("Hello! How can I help you today?")

@@ -16,6 +16,58 @@ from adapters.audio_utils import generate_beep_sequence, generate_tone
 from protocols import LLMProtocol, STTProtocol, TTSProtocol
 
 
+class MockSTTStream:
+    """Mock STT stream that implements async context manager protocol."""
+
+    def __init__(self, transcriptions: list[str], simulate_delay: float = 0.0):
+        self.transcriptions = transcriptions
+        self.simulate_delay = simulate_delay
+        self._index = 0
+
+    async def __aenter__(self):
+        """Enter async context manager."""
+        logger.debug("MockSTTStream context entered")
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Exit async context manager."""
+        logger.debug("MockSTTStream context exited")
+        return None
+
+    def __aiter__(self):
+        """Support async iteration (returns empty iterator for now)."""
+        return self
+
+    async def __anext__(self):
+        """Never yield any events (stream is always empty)."""
+        # For now, just raise StopAsyncIteration to end the stream
+        # In a real implementation, this would yield STT events
+        raise StopAsyncIteration
+
+
+class MockSTTCapabilities:
+    """Mock STT capabilities for compatibility with LiveKit."""
+
+    def __init__(self, streaming: bool = True, interim_results: bool = True):
+        self.streaming = streaming
+        self.interim_results = interim_results
+
+
+class MockLLMCapabilities:
+    """Mock LLM capabilities for compatibility with LiveKit."""
+
+    def __init__(self, streaming: bool = True, supports_function_calling: bool = True):
+        self.streaming = streaming
+        self.supports_function_calling = supports_function_calling
+
+
+class MockTTSCapabilities:
+    """Mock TTS capabilities for compatibility with LiveKit."""
+
+    def __init__(self, streaming: bool = True):
+        self.streaming = streaming
+
+
 class MockSTT:
     """Mock Speech-to-Text adapter.
 
@@ -38,12 +90,27 @@ class MockSTT:
         self.transcriptions = transcriptions or []
         self.simulate_delay = simulate_delay
         self._call_count = 0
+        self.capabilities = MockSTTCapabilities()
         logger.info("MockSTT initialized")
+
+    def stream(self, **kwargs):
+        """Create a mock STT stream.
+
+        Args:
+            **kwargs: Ignored, for compatibility with LiveKit's STT interface
+
+        Returns:
+            MockSTTStream: Async context manager that yields no events
+        """
+        logger.debug("MockSTT.stream() called")
+        return MockSTTStream(self.transcriptions, self.simulate_delay)
 
     def __getattr__(self, name: str) -> Any:
         """Handle attribute access for compatibility with LiveKit's STT interface."""
         logger.debug(f"MockSTT attribute accessed: {name}")
-        return None
+        # For unknown attributes, return a mock object that won't cause AttributeErrors
+        # when methods are called on it
+        return lambda *args, **kwargs: None
 
     async def __aenter__(self):
         """Support async context manager protocol."""
@@ -82,12 +149,15 @@ class MockLLM:
         ]
         self.simulate_delay = simulate_delay
         self._call_count = 0
+        self.capabilities = MockLLMCapabilities()
         logger.info("MockLLM initialized with {} responses", len(self.responses))
 
     def __getattr__(self, name: str) -> Any:
         """Handle attribute access for compatibility with LiveKit's LLM interface."""
         logger.debug(f"MockLLM attribute accessed: {name}")
-        return None
+        # For unknown attributes, return a mock object that won't cause AttributeErrors
+        # when methods are called on it
+        return lambda *args, **kwargs: None
 
     async def __aenter__(self):
         """Support async context manager protocol."""
@@ -185,6 +255,7 @@ class MockTTS:
         self.num_channels = num_channels
         self.audio_type = audio_type
         self._call_count = 0
+        self.capabilities = MockTTSCapabilities()
         logger.info(
             f"MockTTS initialized with voice: {voice}, "
             f"sample_rate: {sample_rate}Hz, audio_type: {audio_type}"
@@ -234,7 +305,9 @@ class MockTTS:
     def __getattr__(self, name: str) -> Any:
         """Handle attribute access for compatibility with LiveKit's TTS interface."""
         logger.debug(f"MockTTS attribute accessed: {name}")
-        return None
+        # For unknown attributes, return a mock object that won't cause AttributeErrors
+        # when methods are called on it
+        return lambda *args, **kwargs: None
 
     async def __aenter__(self):
         """Support async context manager protocol."""

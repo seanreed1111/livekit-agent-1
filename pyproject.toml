@@ -21,7 +21,7 @@ dependencies = [
 dev = [
     "pytest",
     "pytest-asyncio",
-    "ruff",
+    "ruff"
 ]
 
 [tool.setuptools.packages.find]
@@ -58,3 +58,4 @@ typeCheckingMode = "standard"
 # Report missing imports as warnings instead of errors
 # This helps reduce false positives when packages are installed but not detected
 reportMissingImports = "warning"
+
