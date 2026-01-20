@@ -95,6 +95,52 @@ In production, use the `start` command:
 uv run python src/agent.py start
 ```
 
+## Makefile & Mock Adapters
+
+This project includes a `Makefile` for convenient development workflows and mock adapters for testing without API keys.
+
+### Quick Commands
+
+```bash
+# See all available commands
+make help
+
+# Run with mock adapters (no API keys needed)
+make mock-console   # Console mode with MockSTT, MockLLM, MockTTS
+make mock-dev       # Dev mode with mock adapters
+
+# Run with production adapters (requires LiveKit Cloud)
+make console        # Console mode
+make dev            # Dev mode
+make start          # Production mode
+
+# Development
+make test           # Run all tests
+make format         # Format code with ruff
+make lint           # Lint code with ruff
+
+# Utilities
+make download-files # Download required model files
+make clean          # Remove generated files
+```
+
+### Mock Adapters
+
+Mock adapters let you develop and test without external API calls:
+
+- **MockSTT** - Simulates speech-to-text
+- **MockLLM** - Returns pre-configured responses
+- **MockTTS** - Generates synthetic audio (tones/beeps)
+
+Benefits:
+- ✅ No API keys required
+- ✅ Works offline
+- ✅ Instant responses (no network latency)
+- ✅ Deterministic for testing
+- ✅ Zero API costs
+
+For detailed documentation, see [MOCK_ADAPTERS.md](MOCK_ADAPTERS.md).
+
 ## Frontend & Telephony
 
 Get started quickly with our pre-built frontend starter apps, or add telephony support:
@@ -113,9 +159,11 @@ For advanced customization, see the [complete frontend guide](https://docs.livek
 
 ## Tests and evals
 
-This project includes a complete suite of evals, based on the LiveKit Agents [testing & evaluation framework](https://docs.livekit.io/agents/build/testing/). To run them, use `pytest`.
+This project includes a complete suite of evals, based on the LiveKit Agents [testing & evaluation framework](https://docs.livekit.io/agents/build/testing/). To run them:
 
 ```console
+make test
+# or
 uv run pytest
 ```
 
