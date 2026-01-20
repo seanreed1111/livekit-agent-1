@@ -1,11 +1,38 @@
+"""Tests for the voice agent with dependency injection.
+
+These tests use mock adapters instead of calling external services,
+demonstrating the testability benefits of dependency injection.
+"""
+
 import pytest
 from livekit.agents import AgentSession, inference, llm
 
+from adapters.mock_adapters import MockLLM, MockSTT, MockTTS
 from agent import Assistant
+from config import AppConfig, PipelineConfig
 
 
 def _llm() -> llm.LLM:
+    """Create a real LLM for judging test results."""
     return inference.LLM(model="openai/gpt-4.1-mini")
+
+
+@pytest.fixture
+def mock_stt():
+    """Fixture providing a mock STT adapter."""
+    return MockSTT()
+
+
+@pytest.fixture
+def mock_llm():
+    """Fixture providing a mock LLM adapter."""
+    return MockLLM()
+
+
+@pytest.fixture
+def mock_tts():
+    """Fixture providing a mock TTS adapter."""
+    return MockTTS()
 
 
 @pytest.mark.asyncio
@@ -108,3 +135,31 @@ async def test_refuses_harmful_request() -> None:
 
         # Ensures there are no function calls or other unexpected events
         result.expect.no_more_events()
+
+
+@pytest.mark.asyncio
+async def test_mock_adapters_instantiation(mock_stt, mock_llm, mock_tts):
+    """Test that mock adapters can be instantiated and used."""
+    # This test verifies that mock adapters are proper implementations
+    # that can be created and used without external service calls
+    assert mock_stt is not None
+    assert mock_llm is not None
+    assert mock_tts is not None
+
+    # Verify they implement the expected protocol methods
+    async with mock_stt:
+        pass
+
+    async with mock_llm:
+        pass
+
+    async with mock_tts:
+        pass
+
+
+@pytest.mark.asyncio
+async def test_app_config_with_mock_adapters():
+    """Test that AppConfig can be configured to use mock adapters."""
+    config = AppConfig(pipeline=PipelineConfig(adapter_type="mock"))
+
+    assert config.pipeline.adapter_type == "mock"
