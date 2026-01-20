@@ -51,12 +51,18 @@ If you use the LiveKit Docs MCP Server to search or browse documentation, also s
 
 ## Testing
 
-When possible, add tests for agent behavior. Read the [documentation](https://docs.livekit.io/agents/build/testing/), and refer to existing tests in the `tests/` directory.  Run tests with `uv run pytest`.
+### When possible, add tests for agent behavior. Read the [documentation](https://docs.livekit.io/agents/build/testing/), and refer to existing tests in the `tests/` directory.  Run tests with `uv run pytest`.
 
-Important: When modifying core agent behavior such as instructions, tool descriptions, and tasks/workflows/handoffs, never just guess what will work. Always use test-driven development (TDD) and begin by writing tests for the desired behavior. For instance, if you're planning to add a new tool, write one or more tests for the tool's behavior, then iterate on the tool until the tests pass correctly. This will ensure you are able to produce a working, reliable agent for the user.
+### Important: When modifying core agent behavior such as instructions, tool descriptions, and tasks/workflows/handoffs, never just guess what will work. Always use test-driven development (TDD) and begin by writing tests for the desired behavior. For instance, if you're planning to add a new tool, write one or more tests for the tool's behavior, then iterate on the tool until the tests pass correctly. This will ensure you are able to produce a working, reliable agent for the user.
+
+### BDD and Gherkin
+- When asked to write BDD scenarios or feature files, they should be written in Gherkin language
+- Only implement steps corresponding to the scenarios when explicitly told to do so
+- When writing authorization/authentication scenarios, write only a minimal set of five or less unless explicitly told otherwise
+  
 
 ## LiveKit CLI
 
-You can make use of the LiveKit CLI (`lk`) for various tasks, with user approval. Installation instructions are available at https://docs.livekit.io/home/cli if needed.
+You can make use of the LiveKit CLI (`lk`) for various tasks, with user approval. 
 
-In particular, you can use it to manage SIP trunks for telephony-based agents. Refer to `lk sip --help` for more information.
+
