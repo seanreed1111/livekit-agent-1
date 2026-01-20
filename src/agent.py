@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from dotenv import load_dotenv
 from livekit import rtc
@@ -15,7 +15,7 @@ from livekit.agents import (
 from livekit.plugins import noise_cancellation, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
-logger = logging.getLogger("agent")
+
 
 load_dotenv(".env.local")
 
