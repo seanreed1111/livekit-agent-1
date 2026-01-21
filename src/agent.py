@@ -9,7 +9,7 @@ from livekit.agents import Agent, AgentServer, JobProcess, cli
 from livekit.plugins import silero
 from loguru import logger
 
-from config import AppConfig
+from config import AppConfig, PipelineConfig
 from factories import create_llm, create_stt, create_tts
 from session_handler import SessionHandler
 
@@ -42,28 +42,18 @@ class VoiceAgentApp:
     to provide STT, LLM, and TTS components, enabling testability and flexibility.
     """
 
-    def __init__(
-        self,
-        stt=None,
-        llm=None,
-        tts=None,
-        config: AppConfig | None = None,
-    ):
+    def __init__(self, config: AppConfig | None = None):
         """Initialize the voice agent application.
 
         Args:
-            stt: Speech-to-text adapter. If None, creates from config.
-            llm: Large language model adapter. If None, creates from config.
-            tts: Text-to-speech adapter. If None, creates from config.
             config: Application configuration. If None, loads from environment.
         """
         # Load configuration
         self.config = config or AppConfig()
 
-        # Create or use provided adapters
-        self.stt = stt or create_stt(self.config.pipeline)
-        self.llm = llm or create_llm(self.config.pipeline)
-        self.tts = tts or create_tts(self.config.pipeline)
+        self.stt = create_stt(self.config.pipeline)
+        self.llm = create_llm(self.config.pipeline)
+        self.tts = create_tts(self.config.pipeline)
 
         # Create agent
         self.agent = Assistant(instructions=self.config.agent.instructions)
@@ -100,5 +90,6 @@ class VoiceAgentApp:
 
 
 if __name__ == "__main__":
-    app = VoiceAgentApp()
+    config = AppConfig(pipeline=PipelineConfig(llm_model="mock"))
+    app = VoiceAgentApp(config=config)
     app.run()
