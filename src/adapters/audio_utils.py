@@ -1,7 +1,7 @@
-"""Audio generation utilities for mock adapters.
+"""Audio generation utilities.
 
 This module provides utilities for generating synthetic audio data for testing,
-including simple tones and beeps that can be used in MockTTS.
+including simple tones and beeps.
 """
 
 import numpy as np

@@ -20,7 +20,7 @@ This occurs after the user speaks and the STT produces a transcript with an empt
 
 The warning occurs because:
 
-1. **STT is configured with language**: In `src/adapters/livekit_adapters.py:25-28`, the LiveKit STT adapter is initialized with:
+1. **STT is configured with language**: The STT factory constructs `livekit.agents.inference.STT` with the configured `stt_language`:
    ```python
    self._stt = inference.STT(
        model=config.stt_model,

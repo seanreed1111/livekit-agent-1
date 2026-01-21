@@ -36,3 +36,5 @@ KMS
 .claude/settings.local.json.example.json.example
 .claude/settings.local.json.example.json.example.json
 .claude/settings.local.json.example.json.example.json.example
+
+temp/

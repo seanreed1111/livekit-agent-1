@@ -11,7 +11,6 @@ from loguru import logger
 
 from config import AppConfig
 from factories import create_llm, create_stt, create_tts
-from protocols import LLMProtocol, STTProtocol, TTSProtocol
 from session_handler import SessionHandler
 
 load_dotenv(".env.local")
@@ -45,9 +44,9 @@ class VoiceAgentApp:
 
     def __init__(
         self,
-        stt: STTProtocol | None = None,
-        llm: LLMProtocol | None = None,
-        tts: TTSProtocol | None = None,
+        stt=None,
+        llm=None,
+        tts=None,
         config: AppConfig | None = None,
     ):
         """Initialize the voice agent application.
@@ -82,10 +81,7 @@ class VoiceAgentApp:
         self.server = AgentServer()
         self._setup_server()
 
-        logger.info(
-            "VoiceAgentApp initialized with adapter type: {}",
-            self.config.pipeline.adapter_type,
-        )
+        logger.info("VoiceAgentApp initialized")
 
     def _setup_server(self):
         """Configure the server with prewarm and session handler."""

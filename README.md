@@ -97,9 +97,9 @@ In production, use the `start` command:
 uv run python src/agent.py start
 ```
 
-## Makefile & Mock Adapters
+## Makefile
 
-This project includes a `Makefile` for convenient development workflows and mock adapters for testing without API keys.
+This project includes a `Makefile` for convenient development workflows.
 
 ### Quick Commands
 
@@ -107,11 +107,7 @@ This project includes a `Makefile` for convenient development workflows and mock
 # See all available commands
 make help
 
-# Run with mock adapters (no API keys needed)
-make mock-console   # Console mode with MockSTT, MockLLM, MockTTS
-make mock-dev       # Dev mode with mock adapters
-
-# Run with production adapters (requires LiveKit Cloud)
+# Run the agent (requires API keys configured for the chosen models)
 make console        # Console mode
 make dev            # Dev mode
 make start          # Production mode
@@ -125,23 +121,6 @@ make lint           # Lint code with ruff
 make download-files # Download required model files
 make clean          # Remove generated files
 ```
-
-### Mock Adapters
-
-Mock adapters let you develop and test without external API calls:
-
-- **MockSTT** - Simulates speech-to-text
-- **MockLLM** - Returns pre-configured responses
-- **MockTTS** - Generates synthetic audio (tones/beeps)
-
-Benefits:
-- ✅ No API keys required
-- ✅ Works offline
-- ✅ Instant responses (no network latency)
-- ✅ Deterministic for testing
-- ✅ Zero API costs
-
-For detailed documentation, see [MOCK_ADAPTERS.md](MOCK_ADAPTERS.md).
 
 ## Frontend & Telephony
 

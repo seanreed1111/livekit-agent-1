@@ -4,13 +4,12 @@ This module contains the SessionHandler class that manages agent sessions
 with dependency-injected STT, LLM, and TTS components.
 """
 
-from livekit.agents import Agent, AgentSession, JobContext, room_io
+from livekit.agents import NOT_GIVEN, Agent, AgentSession, JobContext, room_io
 from livekit.plugins import noise_cancellation
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from loguru import logger
 
 from config import SessionConfig
-from protocols import LLMProtocol, STTProtocol, TTSProtocol
 
 
 class SessionHandler:
@@ -22,9 +21,9 @@ class SessionHandler:
 
     def __init__(
         self,
-        stt: STTProtocol,
-        llm: LLMProtocol,
-        tts: TTSProtocol,
+        stt,
+        llm,
+        tts,
         agent: Agent,
         session_config: SessionConfig,
     ):
@@ -44,29 +43,6 @@ class SessionHandler:
         self.session_config = session_config
         logger.info("SessionHandler initialized")
 
-    def _unwrap_adapter(self, adapter):
-        """Unwrap LiveKit adapters to get the underlying inference object.
-
-        LiveKit adapters wrap the actual inference objects, but AgentSession
-        expects the unwrapped objects. This method extracts the underlying
-        object from LiveKit adapters while leaving mock adapters as-is.
-
-        Args:
-            adapter: An adapter object (LiveKit or mock)
-
-        Returns:
-            The underlying object for LiveKit adapters, or the adapter itself for mocks
-        """
-        # LiveKit adapters store the underlying object in _stt, _llm, or _tts
-        # We check __dict__ directly to avoid triggering __getattr__ on mock adapters
-        for attr in ("_stt", "_llm", "_tts"):
-            if attr in adapter.__dict__:
-                underlying = adapter.__dict__[attr]
-                if underlying is not None:
-                    return underlying
-        # Mock adapters don't have underlying objects, return as-is
-        return adapter
-
     async def handle_session(self, ctx: JobContext) -> None:
         """Handle an RTC session.
 
@@ -80,27 +56,24 @@ class SessionHandler:
 
         logger.info(f"Starting session for room: {ctx.room.name}")
 
-        # Unwrap adapters to get actual objects for AgentSession
-        # LiveKit adapters wrap inference objects, but AgentSession needs the unwrapped versions
-        stt = self._unwrap_adapter(self.stt)
-        llm = self._unwrap_adapter(self.llm)
-        tts = self._unwrap_adapter(self.tts)
-
         logger.debug(
-            f"Using STT: {type(stt).__name__}, LLM: {type(llm).__name__}, TTS: {type(tts).__name__}"
+            f"Using STT: {type(self.stt).__name__}, LLM: {type(self.llm).__name__}, TTS: {type(self.tts).__name__}"
         )
 
         # Set up the voice AI pipeline with injected components
+        turn_detection = (
+            MultilingualModel()
+            if self.session_config.use_multilingual_turn_detector
+            else NOT_GIVEN
+        )
+        vad = ctx.proc.userdata.get("vad") or NOT_GIVEN
+
         session = AgentSession(
-            stt=stt,
-            llm=llm,
-            tts=tts,
-            turn_detection=(
-                MultilingualModel()
-                if self.session_config.use_multilingual_turn_detector
-                else None
-            ),
-            vad=ctx.proc.userdata.get("vad"),
+            stt=self.stt,
+            llm=self.llm,
+            tts=self.tts,
+            turn_detection=turn_detection,
+            vad=vad,
             preemptive_generation=self.session_config.preemptive_generation,
         )
 
