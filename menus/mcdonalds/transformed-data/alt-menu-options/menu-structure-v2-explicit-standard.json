@@ -1,0 +1,51 @@
+{
+  "Breakfast": {
+    "Bacon": ["Standard"],
+    "Big Breakfast (Large Biscuit)": [
+      "Standard",
+      "with Egg Whites",
+      "with Hotcakes",
+      "with Hotcakes and Egg Whites"
+    ],
+    "Fruit & Maple Oatmeal": [
+      "Standard",
+      "without Brown Sugar"
+    ],
+    "Hotcakes": [
+      "Standard",
+      "with Sausage"
+    ],
+    "Sausage McMuffin": [
+      "Standard",
+      "with Egg",
+      "with Egg Whites"
+    ]
+  },
+  "Beef & Pork": {
+    "Big Mac": ["Standard"],
+    "Double Quarter Pounder": [
+      "Standard",
+      "with Cheese"
+    ],
+    "Quarter Pounder": [
+      "Standard",
+      "with Bacon & Cheese",
+      "with Bacon Habanero Ranch",
+      "with Cheese"
+    ]
+  },
+  "Salads": {
+    "Premium Bacon Ranch Salad (without Chicken)": [
+      "Standard",
+      "with Crispy Chicken",
+      "with Grilled Chicken"
+    ]
+  },
+  "Smoothies & Shakes": {
+    "McFlurry (Medium)": [
+      "with M&Ms Candies",
+      "with Oreo Cookies",
+      "with Reeses Peanut Butter Cups"
+    ]
+  }
+}

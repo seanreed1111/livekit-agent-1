@@ -6,11 +6,73 @@ The following is a guide for working with this project.
 
 ## Project structure
 
-This Python project uses the `uv` package manager. You should always use `uv` to install dependencies, run the agent, and run tests.
+This Python project uses the `uv` package manager. You should **always** use `uv` for all Python operations - installing dependencies, running scripts, running tests, and executing any Python commands.
 
 All app-level code is in the `src/` directory. In general, simple agents can be constructed with a single `agent.py` file. Additional files can be added, but you must retain `agent.py` as the entrypoint (see the associated Dockerfile for how this is deployed).
 
 Be sure to maintain code formatting. You can use the ruff formatter/linter as needed: `uv run ruff format` and `uv run ruff check`.
+
+## Package Management with `uv`
+
+**IMPORTANT:** This project uses `uv` as its package manager. You must **always** use `uv` commands instead of `pip` or bare `python` commands.
+
+### Running Python Scripts
+
+**Always use `uv run python` instead of just `python`:**
+
+```bash
+# ✓ Correct
+uv run python script.py
+uv run python -m module
+
+# ✗ Wrong
+python script.py
+python3 script.py
+```
+
+The `uv run` prefix ensures the script runs in the correct virtual environment with all dependencies available. **Do not manually activate virtual environments** - `uv run` handles this automatically.
+
+### Adding Dependencies
+
+Use `uv add` to install new packages:
+
+```bash
+# Add a regular dependency
+uv add package-name
+
+# Add a dev dependency (for testing, linting, etc.)
+uv add --dev package-name
+
+# Add with version constraints
+uv add "package-name>=1.0.0"
+```
+
+### Running Tests and Commands
+
+Always prefix commands with `uv run`:
+
+```bash
+# Run tests
+uv run pytest
+
+# Run specific test file
+uv run pytest tests/test_agent.py
+
+# Run linting and formatting
+uv run ruff check
+uv run ruff format
+
+# Run the agent
+uv run python src/agent.py dev
+```
+
+### Syncing Dependencies
+
+After pulling changes that modify `pyproject.toml`, sync dependencies:
+
+```bash
+uv sync
+```
 
 ## LiveKit Documentation
 

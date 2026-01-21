@@ -1,0 +1,74 @@
+{
+  "Breakfast": {
+    "Bacon": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Big Breakfast (Large Biscuit)": {
+      "available_as_base": true,
+      "variations": [
+        "Egg Whites",
+        "Hotcakes",
+        "Hotcakes and Egg Whites"
+      ]
+    },
+    "Fruit & Maple Oatmeal": {
+      "available_as_base": true,
+      "variations": [
+        "without Brown Sugar"
+      ]
+    },
+    "Hotcakes": {
+      "available_as_base": true,
+      "variations": [
+        "Sausage"
+      ]
+    },
+    "Sausage McMuffin": {
+      "available_as_base": true,
+      "variations": [
+        "Egg",
+        "Egg Whites"
+      ]
+    }
+  },
+  "Beef & Pork": {
+    "Big Mac": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Double Quarter Pounder": {
+      "available_as_base": true,
+      "variations": [
+        "Cheese"
+      ]
+    },
+    "Quarter Pounder": {
+      "available_as_base": true,
+      "variations": [
+        "Bacon & Cheese",
+        "Bacon Habanero Ranch",
+        "Cheese"
+      ]
+    }
+  },
+  "Salads": {
+    "Premium Bacon Ranch Salad (without Chicken)": {
+      "available_as_base": true,
+      "variations": [
+        "Crispy Chicken",
+        "Grilled Chicken"
+      ]
+    }
+  },
+  "Smoothies & Shakes": {
+    "McFlurry (Medium)": {
+      "available_as_base": false,
+      "variations": [
+        "M&Ms Candies",
+        "Oreo Cookies",
+        "Reeses Peanut Butter Cups"
+      ]
+    }
+  }
+}

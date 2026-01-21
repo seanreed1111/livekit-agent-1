@@ -1,0 +1,342 @@
+{
+  "Breakfast": {
+    "Bacon": [null],
+    "Big Breakfast (Large Biscuit)": [
+      "Egg Whites",
+      "Hotcakes",
+      "Hotcakes and Egg Whites",
+      null
+    ],
+    "Big Breakfast (Regular Biscuit)": [
+      "Egg Whites",
+      "Hotcakes",
+      "Hotcakes and Egg Whites",
+      null
+    ],
+    "Cinnamon Melts": [null],
+    "Egg McMuffin": [null],
+    "Egg White Delight": [null],
+    "Fruit & Maple Oatmeal": [
+      "without Brown Sugar",
+      null
+    ],
+    "Hash Brown": [null],
+    "Hotcakes": [
+      "Sausage",
+      null
+    ],
+    "Sausage": [null],
+    "Sausage Biscuit (Large Biscuit)": [
+      "Egg",
+      "Egg Whites",
+      null
+    ],
+    "Sausage Biscuit (Regular Biscuit)": [
+      "Egg",
+      "Egg Whites",
+      null
+    ],
+    "Sausage Burrito": [null],
+    "Sausage McGriddles": [null],
+    "Sausage McMuffin": [
+      "Egg",
+      "Egg Whites",
+      null
+    ],
+    "Southern Style Chicken Biscuit (Large Biscuit)": [null],
+    "Southern Style Chicken Biscuit (Regular Biscuit)": [null],
+    "Steak & Egg Biscuit (Regular Biscuit)": [null],
+    "Steak & Egg Biscuit (Large Biscuit)": [null],
+    "Steak & Egg McMuffin": [null]
+  },
+  "Beef & Pork": {
+    "Bacon Clubhouse Burger": [null],
+    "Bacon McDouble": [null],
+    "Big Mac": [null],
+    "Cheeseburger": [null],
+    "Daily Double": [null],
+    "Double Cheeseburger": [null],
+    "Double Quarter Pounder": [
+      "Cheese",
+      null
+    ],
+    "Hamburger": [null],
+    "Jalape\u00f1o Double": [null],
+    "McDouble": [null],
+    "McRib": [null],
+    "Quarter Pounder": [
+      "Bacon & Cheese",
+      "Bacon Habanero Ranch",
+      "Cheese",
+      null
+    ],
+    "Quarter Pounder Deluxe": [null]
+  },
+  "Chicken & Fish": {
+    "Bacon Buffalo Ranch McChicken": [null],
+    "Bacon Cheddar McChicken": [null],
+    "Bacon Clubhouse Crispy Chicken Sandwich": [null],
+    "Bacon Clubhouse Grilled Chicken Sandwich": [null],
+    "Buffalo Ranch McChicken": [null],
+    "Chicken McNuggets (10 piece)": [null],
+    "Chicken McNuggets (20 piece)": [null],
+    "Chicken McNuggets (4 piece)": [null],
+    "Chicken McNuggets (40 piece)": [null],
+    "Chicken McNuggets (6 piece)": [null],
+    "Filet-O-Fish": [null],
+    "McChicken": [null],
+    "Premium Crispy Chicken Classic Sandwich": [null],
+    "Premium Crispy Chicken Club Sandwich": [null],
+    "Premium Crispy Chicken Ranch BLT Sandwich": [null],
+    "Premium Grilled Chicken Classic Sandwich": [null],
+    "Premium Grilled Chicken Club Sandwich": [null],
+    "Premium Grilled Chicken Ranch BLT Sandwich": [null],
+    "Premium McWrap Chicken & Bacon (Crispy Chicken)": [null],
+    "Premium McWrap Chicken & Bacon (Grilled Chicken)": [null],
+    "Premium McWrap Chicken & Ranch (Crispy Chicken)": [null],
+    "Premium McWrap Chicken & Ranch (Grilled Chicken)": [null],
+    "Premium McWrap Chicken Sweet Chili (Crispy Chicken)": [null],
+    "Premium McWrap Chicken Sweet Chili (Grilled Chicken)": [null],
+    "Premium McWrap Southwest Chicken (Crispy Chicken)": [null],
+    "Premium McWrap Southwest Chicken (Grilled Chicken)": [null],
+    "Southern Style Crispy Chicken Sandwich": [null]
+  },
+  "Salads": {
+    "Premium Bacon Ranch Salad (without Chicken)": [
+      "Crispy Chicken",
+      "Grilled Chicken",
+      null
+    ],
+    "Premium Southwest Salad (without Chicken)": [
+      "Crispy Chicken",
+      "Grilled Chicken",
+      null
+    ]
+  },
+  "Snacks & Sides": {
+    "Apple Slices": [null],
+    "Chipotle BBQ Snack Wrap (Crispy Chicken)": [null],
+    "Chipotle BBQ Snack Wrap (Grilled Chicken)": [null],
+    "Fruit n Yogurt Parfait": [null],
+    "Honey Mustard Snack Wrap (Crispy Chicken)": [null],
+    "Honey Mustard Snack Wrap (Grilled Chicken)": [null],
+    "Kids French Fries": [null],
+    "Large French Fries": [null],
+    "Medium French Fries": [null],
+    "Ranch Snack Wrap (Crispy Chicken)": [null],
+    "Ranch Snack Wrap (Grilled Chicken)": [null],
+    "Side Salad": [null],
+    "Small French Fries": [null]
+  },
+  "Desserts": {
+    "Baked Apple Pie": [null],
+    "Chocolate Chip Cookie": [null],
+    "Hot Caramel Sundae": [null],
+    "Hot Fudge Sundae": [null],
+    "Kids Ice Cream Cone": [null],
+    "Oatmeal Raisin Cookie": [null],
+    "Strawberry Sundae": [null]
+  },
+  "Beverages": {
+    "1% Low Fat Milk Jug": [null],
+    "Coca-Cola Classic (Child)": [null],
+    "Coca-Cola Classic (Large)": [null],
+    "Coca-Cola Classic (Medium)": [null],
+    "Coca-Cola Classic (Small)": [null],
+    "Dasani Water Bottle": [null],
+    "Diet Coke (Child)": [null],
+    "Diet Coke (Large)": [null],
+    "Diet Coke (Medium)": [null],
+    "Diet Coke (Small)": [null],
+    "Diet Dr Pepper (Child)": [null],
+    "Diet Dr Pepper (Large)": [null],
+    "Diet Dr Pepper (Medium)": [null],
+    "Diet Dr Pepper (Small)": [null],
+    "Dr Pepper (Child)": [null],
+    "Dr Pepper (Large)": [null],
+    "Dr Pepper (Medium)": [null],
+    "Dr Pepper (Small)": [null],
+    "Fat Free Chocolate Milk Jug": [null],
+    "Minute Maid 100% Apple Juice Box": [null],
+    "Minute Maid Orange Juice (Large)": [null],
+    "Minute Maid Orange Juice (Medium)": [null],
+    "Minute Maid Orange Juice (Small)": [null],
+    "Sprite (Child)": [null],
+    "Sprite (Large)": [null],
+    "Sprite (Medium)": [null],
+    "Sprite (Small)": [null]
+  },
+  "Coffee & Tea": {
+    "Caramel Iced Coffee (Large)": [null],
+    "Caramel Iced Coffee (Medium)": [null],
+    "Caramel Iced Coffee (Small)": [null],
+    "Caramel Latte (Large)": [null],
+    "Caramel Latte (Medium)": [null],
+    "Caramel Latte (Small)": [null],
+    "Caramel Mocha (Large)": [null],
+    "Caramel Mocha (Medium)": [null],
+    "Caramel Mocha (Small)": [null],
+    "Coffee (Large)": [null],
+    "Coffee (Medium)": [null],
+    "Coffee (Small)": [null],
+    "Frapp\u00e9 Caramel (Large)": [null],
+    "Frapp\u00e9 Caramel (Medium)": [null],
+    "Frapp\u00e9 Caramel (Small)": [null],
+    "Frapp\u00e9 Chocolate Chip (Large)": [null],
+    "Frapp\u00e9 Chocolate Chip (Medium)": [null],
+    "Frapp\u00e9 Chocolate Chip (Small)": [null],
+    "Frapp\u00e9 Mocha (Large)": [null],
+    "Frapp\u00e9 Mocha (Medium)": [null],
+    "Frapp\u00e9 Mocha (Small)": [null],
+    "French Vanilla Iced Coffee (Large)": [null],
+    "French Vanilla Iced Coffee (Medium)": [null],
+    "French Vanilla Iced Coffee (Small)": [null],
+    "French Vanilla Latte (Large)": [null],
+    "French Vanilla Latte (Medium)": [null],
+    "French Vanilla Latte (Small)": [null],
+    "Hazelnut Iced Coffee (Large)": [null],
+    "Hazelnut Iced Coffee (Medium)": [null],
+    "Hazelnut Iced Coffee (Small)": [null],
+    "Hazelnut Latte (Large)": [null],
+    "Hazelnut Latte (Medium)": [null],
+    "Hazelnut Latte (Small)": [null],
+    "Hot Chocolate (Large)": [
+      "Nonfat Milk",
+      null
+    ],
+    "Hot Chocolate (Medium)": [
+      "Nonfat Milk",
+      null
+    ],
+    "Hot Chocolate (Small)": [
+      "Nonfat Milk",
+      null
+    ],
+    "Iced Caramel Mocha (Large)": [null],
+    "Iced Caramel Mocha (Medium)": [null],
+    "Iced Caramel Mocha (Small)": [null],
+    "Iced Coffee (Large)": [
+      "Sugar Free French Vanilla Syrup",
+      null
+    ],
+    "Iced Coffee (Medium)": [
+      "Sugar Free French Vanilla Syrup",
+      null
+    ],
+    "Iced Coffee (Small)": [
+      "Sugar Free French Vanilla Syrup",
+      null
+    ],
+    "Iced Mocha (Large)": [
+      "Nonfat Milk",
+      null
+    ],
+    "Iced Mocha (Medium)": [
+      "Nonfat Milk",
+      null
+    ],
+    "Iced Mocha (Small)": [
+      "Nonfat Milk",
+      null
+    ],
+    "Iced Nonfat Caramel Mocha (Large)": [null],
+    "Iced Nonfat Caramel Mocha (Medium)": [null],
+    "Iced Nonfat Caramel Mocha (Small)": [null],
+    "Iced Tea (Child)": [null],
+    "Iced Tea (Large)": [null],
+    "Iced Tea (Medium)": [null],
+    "Iced Tea (Small)": [null],
+    "Latte (Large)": [
+      "Sugar Free French Vanilla Syrup",
+      null
+    ],
+    "Latte (Medium)": [
+      "Sugar Free French Vanilla Syrup",
+      null
+    ],
+    "Latte (Small)": [
+      "Sugar Free French Vanilla Syrup",
+      null
+    ],
+    "Mocha (Large)": [
+      "Nonfat Milk",
+      null
+    ],
+    "Mocha (Medium)": [
+      "Nonfat Milk",
+      null
+    ],
+    "Mocha (Small)": [
+      "Nonfat Milk",
+      null
+    ],
+    "Nonfat Caramel Latte (Large)": [null],
+    "Nonfat Caramel Latte (Medium)": [null],
+    "Nonfat Caramel Latte (Small)": [null],
+    "Nonfat Caramel Mocha (Large)": [null],
+    "Nonfat Caramel Mocha (Medium)": [null],
+    "Nonfat Caramel Mocha (Small)": [null],
+    "Nonfat French Vanilla Latte (Large)": [null],
+    "Nonfat French Vanilla Latte (Medium)": [null],
+    "Nonfat French Vanilla Latte (Small)": [null],
+    "Nonfat Hazelnut Latte (Large)": [null],
+    "Nonfat Hazelnut Latte (Medium)": [null],
+    "Nonfat Hazelnut Latte (Small)": [null],
+    "Nonfat Latte (Large)": [
+      "Sugar Free French Vanilla Syrup",
+      null
+    ],
+    "Nonfat Latte (Medium)": [
+      "Sugar Free French Vanilla Syrup",
+      null
+    ],
+    "Nonfat Latte (Small)": [
+      "Sugar Free French Vanilla Syrup",
+      null
+    ],
+    "Regular Iced Coffee (Large)": [null],
+    "Regular Iced Coffee (Medium)": [null],
+    "Regular Iced Coffee (Small)": [null],
+    "Sweet Tea (Child)": [null],
+    "Sweet Tea (Large)": [null],
+    "Sweet Tea (Medium)": [null],
+    "Sweet Tea (Small)": [null]
+  },
+  "Smoothies & Shakes": {
+    "Blueberry Pomegranate Smoothie (Large)": [null],
+    "Blueberry Pomegranate Smoothie (Medium)": [null],
+    "Blueberry Pomegranate Smoothie (Small)": [null],
+    "Chocolate Shake (Large)": [null],
+    "Chocolate Shake (Medium)": [null],
+    "Chocolate Shake (Small)": [null],
+    "Mango Pineapple Smoothie (Large)": [null],
+    "Mango Pineapple Smoothie (Medium)": [null],
+    "Mango Pineapple Smoothie (Small)": [null],
+    "McFlurry (Medium)": [
+      "M&Ms Candies",
+      "Oreo Cookies",
+      "Reeses Peanut Butter Cups"
+    ],
+    "McFlurry (Small)": [
+      "M&Ms Candies",
+      "Oreo Cookies",
+      "Reeses Peanut Butter Cups"
+    ],
+    "McFlurry (Snack)": [
+      "M&Ms Candies",
+      "Oreo Cookies",
+      "Reeses Peanut Butter Cups"
+    ],
+    "Shamrock Shake (Large)": [null],
+    "Shamrock Shake (Medium)": [null],
+    "Strawberry Banana Smoothie (Large)": [null],
+    "Strawberry Banana Smoothie (Medium)": [null],
+    "Strawberry Banana Smoothie (Small)": [null],
+    "Strawberry Shake (Large)": [null],
+    "Strawberry Shake (Medium)": [null],
+    "Strawberry Shake (Small)": [null],
+    "Vanilla Shake (Large)": [null],
+    "Vanilla Shake (Medium)": [null],
+    "Vanilla Shake (Small)": [null]
+  }
+}

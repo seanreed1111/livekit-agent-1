@@ -1,0 +1,64 @@
+{
+  "Breakfast": {
+    "Bacon": {
+      "modifications": []
+    },
+    "Big Breakfast (Large Biscuit)": {
+      "modifications": [
+        {"name": "Egg Whites", "required": false},
+        {"name": "Hotcakes", "required": false},
+        {"name": "Hotcakes and Egg Whites", "required": false}
+      ]
+    },
+    "Fruit & Maple Oatmeal": {
+      "modifications": [
+        {"name": "without Brown Sugar", "required": false}
+      ]
+    },
+    "Hotcakes": {
+      "modifications": [
+        {"name": "Sausage", "required": false}
+      ]
+    },
+    "Sausage McMuffin": {
+      "modifications": [
+        {"name": "Egg", "required": false},
+        {"name": "Egg Whites", "required": false}
+      ]
+    }
+  },
+  "Beef & Pork": {
+    "Big Mac": {
+      "modifications": []
+    },
+    "Double Quarter Pounder": {
+      "modifications": [
+        {"name": "Cheese", "required": false}
+      ]
+    },
+    "Quarter Pounder": {
+      "modifications": [
+        {"name": "Bacon & Cheese", "required": false},
+        {"name": "Bacon Habanero Ranch", "required": false},
+        {"name": "Cheese", "required": false}
+      ]
+    }
+  },
+  "Salads": {
+    "Premium Bacon Ranch Salad (without Chicken)": {
+      "modifications": [
+        {"name": "Crispy Chicken", "required": false},
+        {"name": "Grilled Chicken", "required": false}
+      ]
+    }
+  },
+  "Smoothies & Shakes": {
+    "McFlurry (Medium)": {
+      "modifications": [
+        {"name": "M&Ms Candies", "required": true},
+        {"name": "Oreo Cookies", "required": true},
+        {"name": "Reeses Peanut Butter Cups", "required": true}
+      ]
+    }
+  }
+}

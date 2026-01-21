@@ -1,0 +1,949 @@
+{
+  "Breakfast": {
+    "Bacon": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Big Breakfast (Large Biscuit)": {
+      "available_as_base": true,
+      "variations": [
+        "Egg Whites",
+        "Hotcakes",
+        "Hotcakes and Egg Whites"
+      ]
+    },
+    "Big Breakfast (Regular Biscuit)": {
+      "available_as_base": true,
+      "variations": [
+        "Egg Whites",
+        "Hotcakes",
+        "Hotcakes and Egg Whites"
+      ]
+    },
+    "Cinnamon Melts": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Egg McMuffin": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Egg White Delight": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Fruit & Maple Oatmeal": {
+      "available_as_base": true,
+      "variations": [
+        "without Brown Sugar"
+      ]
+    },
+    "Hash Brown": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Hotcakes": {
+      "available_as_base": true,
+      "variations": [
+        "Sausage"
+      ]
+    },
+    "Sausage": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sausage Biscuit (Large Biscuit)": {
+      "available_as_base": true,
+      "variations": [
+        "Egg",
+        "Egg Whites"
+      ]
+    },
+    "Sausage Biscuit (Regular Biscuit)": {
+      "available_as_base": true,
+      "variations": [
+        "Egg",
+        "Egg Whites"
+      ]
+    },
+    "Sausage Burrito": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sausage McGriddles": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sausage McMuffin": {
+      "available_as_base": true,
+      "variations": [
+        "Egg",
+        "Egg Whites"
+      ]
+    },
+    "Southern Style Chicken Biscuit (Large Biscuit)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Southern Style Chicken Biscuit (Regular Biscuit)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Steak & Egg Biscuit (Regular Biscuit)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Steak & Egg Biscuit (Large Biscuit)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Steak & Egg McMuffin": {
+      "available_as_base": true,
+      "variations": []
+    }
+  },
+  "Beef & Pork": {
+    "Bacon Clubhouse Burger": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Bacon McDouble": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Big Mac": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Cheeseburger": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Daily Double": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Double Cheeseburger": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Double Quarter Pounder": {
+      "available_as_base": true,
+      "variations": [
+        "Cheese"
+      ]
+    },
+    "Hamburger": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Jalapeño Double": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "McDouble": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "McRib": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Quarter Pounder": {
+      "available_as_base": true,
+      "variations": [
+        "Bacon & Cheese",
+        "Bacon Habanero Ranch",
+        "Cheese"
+      ]
+    },
+    "Quarter Pounder Deluxe": {
+      "available_as_base": true,
+      "variations": []
+    }
+  },
+  "Chicken & Fish": {
+    "Bacon Buffalo Ranch McChicken": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Bacon Cheddar McChicken": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Bacon Clubhouse Crispy Chicken Sandwich": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Bacon Clubhouse Grilled Chicken Sandwich": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Buffalo Ranch McChicken": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chicken McNuggets (10 piece)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chicken McNuggets (20 piece)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chicken McNuggets (4 piece)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chicken McNuggets (40 piece)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chicken McNuggets (6 piece)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Filet-O-Fish": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "McChicken": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium Crispy Chicken Classic Sandwich": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium Crispy Chicken Club Sandwich": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium Crispy Chicken Ranch BLT Sandwich": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium Grilled Chicken Classic Sandwich": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium Grilled Chicken Club Sandwich": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium Grilled Chicken Ranch BLT Sandwich": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium McWrap Chicken & Bacon (Crispy Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium McWrap Chicken & Bacon (Grilled Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium McWrap Chicken & Ranch (Crispy Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium McWrap Chicken & Ranch (Grilled Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium McWrap Chicken Sweet Chili (Crispy Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium McWrap Chicken Sweet Chili (Grilled Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium McWrap Southwest Chicken (Crispy Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Premium McWrap Southwest Chicken (Grilled Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Southern Style Crispy Chicken Sandwich": {
+      "available_as_base": true,
+      "variations": []
+    }
+  },
+  "Salads": {
+    "Premium Bacon Ranch Salad (without Chicken)": {
+      "available_as_base": true,
+      "variations": [
+        "Crispy Chicken",
+        "Grilled Chicken"
+      ]
+    },
+    "Premium Southwest Salad (without Chicken)": {
+      "available_as_base": true,
+      "variations": [
+        "Crispy Chicken",
+        "Grilled Chicken"
+      ]
+    }
+  },
+  "Snacks & Sides": {
+    "Apple Slices": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chipotle BBQ Snack Wrap (Crispy Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chipotle BBQ Snack Wrap (Grilled Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Fruit n Yogurt Parfait": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Honey Mustard Snack Wrap (Crispy Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Honey Mustard Snack Wrap (Grilled Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Kids French Fries": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Large French Fries": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Medium French Fries": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Ranch Snack Wrap (Crispy Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Ranch Snack Wrap (Grilled Chicken)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Side Salad": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Small French Fries": {
+      "available_as_base": true,
+      "variations": []
+    }
+  },
+  "Desserts": {
+    "Baked Apple Pie": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chocolate Chip Cookie": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Hot Caramel Sundae": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Hot Fudge Sundae": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Kids Ice Cream Cone": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Oatmeal Raisin Cookie": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Strawberry Sundae": {
+      "available_as_base": true,
+      "variations": []
+    }
+  },
+  "Beverages": {
+    "1% Low Fat Milk Jug": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Coca-Cola Classic (Child)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Coca-Cola Classic (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Coca-Cola Classic (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Coca-Cola Classic (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Dasani Water Bottle": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Diet Coke (Child)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Diet Coke (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Diet Coke (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Diet Coke (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Diet Dr Pepper (Child)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Diet Dr Pepper (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Diet Dr Pepper (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Diet Dr Pepper (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Dr Pepper (Child)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Dr Pepper (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Dr Pepper (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Dr Pepper (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Fat Free Chocolate Milk Jug": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Minute Maid 100% Apple Juice Box": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Minute Maid Orange Juice (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Minute Maid Orange Juice (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Minute Maid Orange Juice (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sprite (Child)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sprite (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sprite (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sprite (Small)": {
+      "available_as_base": true,
+      "variations": []
+    }
+  },
+  "Coffee & Tea": {
+    "Caramel Iced Coffee (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Caramel Iced Coffee (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Caramel Iced Coffee (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Caramel Latte (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Caramel Latte (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Caramel Latte (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Caramel Mocha (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Caramel Mocha (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Caramel Mocha (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Coffee (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Coffee (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Coffee (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Frappé Caramel (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Frappé Caramel (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Frappé Caramel (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Frappé Chocolate Chip (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Frappé Chocolate Chip (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Frappé Chocolate Chip (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Frappé Mocha (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Frappé Mocha (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Frappé Mocha (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "French Vanilla Iced Coffee (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "French Vanilla Iced Coffee (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "French Vanilla Iced Coffee (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "French Vanilla Latte (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "French Vanilla Latte (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "French Vanilla Latte (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Hazelnut Iced Coffee (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Hazelnut Iced Coffee (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Hazelnut Iced Coffee (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Hazelnut Latte (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Hazelnut Latte (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Hazelnut Latte (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Hot Chocolate (Large)": {
+      "available_as_base": true,
+      "variations": [
+        "Nonfat Milk"
+      ]
+    },
+    "Hot Chocolate (Medium)": {
+      "available_as_base": true,
+      "variations": [
+        "Nonfat Milk"
+      ]
+    },
+    "Hot Chocolate (Small)": {
+      "available_as_base": true,
+      "variations": [
+        "Nonfat Milk"
+      ]
+    },
+    "Iced Caramel Mocha (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Iced Caramel Mocha (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Iced Caramel Mocha (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Iced Coffee (Large)": {
+      "available_as_base": true,
+      "variations": [
+        "Sugar Free French Vanilla Syrup"
+      ]
+    },
+    "Iced Coffee (Medium)": {
+      "available_as_base": true,
+      "variations": [
+        "Sugar Free French Vanilla Syrup"
+      ]
+    },
+    "Iced Coffee (Small)": {
+      "available_as_base": true,
+      "variations": [
+        "Sugar Free French Vanilla Syrup"
+      ]
+    },
+    "Iced Mocha (Large)": {
+      "available_as_base": true,
+      "variations": [
+        "Nonfat Milk"
+      ]
+    },
+    "Iced Mocha (Medium)": {
+      "available_as_base": true,
+      "variations": [
+        "Nonfat Milk"
+      ]
+    },
+    "Iced Mocha (Small)": {
+      "available_as_base": true,
+      "variations": [
+        "Nonfat Milk"
+      ]
+    },
+    "Iced Nonfat Caramel Mocha (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Iced Nonfat Caramel Mocha (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Iced Nonfat Caramel Mocha (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Iced Tea (Child)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Iced Tea (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Iced Tea (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Iced Tea (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Latte (Large)": {
+      "available_as_base": true,
+      "variations": [
+        "Sugar Free French Vanilla Syrup"
+      ]
+    },
+    "Latte (Medium)": {
+      "available_as_base": true,
+      "variations": [
+        "Sugar Free French Vanilla Syrup"
+      ]
+    },
+    "Latte (Small)": {
+      "available_as_base": true,
+      "variations": [
+        "Sugar Free French Vanilla Syrup"
+      ]
+    },
+    "Mocha (Large)": {
+      "available_as_base": true,
+      "variations": [
+        "Nonfat Milk"
+      ]
+    },
+    "Mocha (Medium)": {
+      "available_as_base": true,
+      "variations": [
+        "Nonfat Milk"
+      ]
+    },
+    "Mocha (Small)": {
+      "available_as_base": true,
+      "variations": [
+        "Nonfat Milk"
+      ]
+    },
+    "Nonfat Caramel Latte (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat Caramel Latte (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat Caramel Latte (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat Caramel Mocha (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat Caramel Mocha (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat Caramel Mocha (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat French Vanilla Latte (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat French Vanilla Latte (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat French Vanilla Latte (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat Hazelnut Latte (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat Hazelnut Latte (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat Hazelnut Latte (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Nonfat Latte (Large)": {
+      "available_as_base": true,
+      "variations": [
+        "Sugar Free French Vanilla Syrup"
+      ]
+    },
+    "Nonfat Latte (Medium)": {
+      "available_as_base": true,
+      "variations": [
+        "Sugar Free French Vanilla Syrup"
+      ]
+    },
+    "Nonfat Latte (Small)": {
+      "available_as_base": true,
+      "variations": [
+        "Sugar Free French Vanilla Syrup"
+      ]
+    },
+    "Regular Iced Coffee (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Regular Iced Coffee (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Regular Iced Coffee (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sweet Tea (Child)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sweet Tea (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sweet Tea (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Sweet Tea (Small)": {
+      "available_as_base": true,
+      "variations": []
+    }
+  },
+  "Smoothies & Shakes": {
+    "Blueberry Pomegranate Smoothie (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Blueberry Pomegranate Smoothie (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Blueberry Pomegranate Smoothie (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chocolate Shake (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chocolate Shake (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Chocolate Shake (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Mango Pineapple Smoothie (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Mango Pineapple Smoothie (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Mango Pineapple Smoothie (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "McFlurry (Medium)": {
+      "available_as_base": false,
+      "variations": [
+        "M&Ms Candies",
+        "Oreo Cookies",
+        "Reeses Peanut Butter Cups"
+      ]
+    },
+    "McFlurry (Small)": {
+      "available_as_base": false,
+      "variations": [
+        "M&Ms Candies",
+        "Oreo Cookies",
+        "Reeses Peanut Butter Cups"
+      ]
+    },
+    "McFlurry (Snack)": {
+      "available_as_base": false,
+      "variations": [
+        "M&Ms Candies",
+        "Oreo Cookies",
+        "Reeses Peanut Butter Cups"
+      ]
+    },
+    "Shamrock Shake (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Shamrock Shake (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Strawberry Banana Smoothie (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Strawberry Banana Smoothie (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Strawberry Banana Smoothie (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Strawberry Shake (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Strawberry Shake (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Strawberry Shake (Small)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Vanilla Shake (Large)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Vanilla Shake (Medium)": {
+      "available_as_base": true,
+      "variations": []
+    },
+    "Vanilla Shake (Small)": {
+      "available_as_base": true,
+      "variations": []
+    }
+  }
+}

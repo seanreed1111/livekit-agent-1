@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/mcdonalds-menu-structure.schema.json",
+  "title": "McDonald's Menu Structure",
+  "description": "Schema for McDonald's menu structure with categories, items, and variations",
+  "type": "object",
+  "patternProperties": {
+    "^.*$": {
+      "type": "object",
+      "description": "A menu category (e.g., Breakfast, Beverages, etc.)",
+      "patternProperties": {
+        "^.*$": {
+          "type": "object",
+          "description": "A menu item with its availability and variations",
+          "properties": {
+            "available_as_base": {
+              "type": "boolean",
+              "description": "Indicates whether this item can be ordered as-is without requiring a variation selection"
+            },
+            "variations": {
+              "type": "array",
+              "description": "List of available variations or modifications for this menu item",
+              "items": {
+                "type": "string",
+                "description": "A variation name (e.g., 'Egg Whites', 'Cheese', 'Nonfat Milk')"
+              }
+            }
+          },
+          "required": ["available_as_base", "variations"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "Breakfast": {
+        "Egg McMuffin": {
+          "available_as_base": true,
+          "variations": []
+        },
+        "Big Breakfast (Large Biscuit)": {
+          "available_as_base": true,
+          "variations": [
+            "Egg Whites",
+            "Hotcakes",
+            "Hotcakes and Egg Whites"
+          ]
+        }
+      },
+      "Smoothies & Shakes": {
+        "McFlurry (Medium)": {
+          "available_as_base": false,
+          "variations": [
+            "M&Ms Candies",
+            "Oreo Cookies",
+            "Reeses Peanut Butter Cups"
+          ]
+        }
+      }
+    }
+  ]
+}
