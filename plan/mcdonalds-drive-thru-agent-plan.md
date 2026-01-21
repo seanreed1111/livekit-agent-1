@@ -12,51 +12,462 @@ This plan outlines the implementation of a custom voice AI agent that acts as a 
 
 ---
 
+## 0. Clean Architecture Principles (Kent Beck + Dave Farley)
+
+This implementation follows clean architecture principles for maintainability, testability, and continuous delivery.
+
+### Core Principles Checklist
+
+**✓ Single Responsibility Principle (SRP)**
+- Each component has one reason to change
+- DriveThruLLM: Context injection only (no state)
+- OrderStateManager: State + persistence only
+- MenuProvider: Read-only data access only
+- menu_validation.py: Pure validation functions only
+
+**✓ Dependency Inversion**
+- Components receive dependencies via constructor (DI)
+- High-level components don't depend on low-level details
+- Easy to mock, easy to test, easy to swap
+
+**✓ Pure Functions Where Possible**
+- menu_validation.py: 100% pure functions
+- No I/O, no side effects, fully deterministic
+- Fast, testable, reusable
+
+**✓ Immutability Reduces Bugs**
+- MenuProvider returns immutable data
+- Menu cannot be accidentally corrupted
+- Thread-safe by design
+
+**✓ Single Source of Truth**
+- OrderStateManager is ONLY owner of order state
+- All mutations flow through one place
+- Easy to debug, easy to audit, easy to test
+
+**✓ Tell, Don't Ask**
+- Tools tell OrderStateManager what to do
+- Don't query state, mutate it, then write back
+- Reduces coupling, increases cohesion
+
+**✓ Test Pyramid**
+- Many fast unit tests (milliseconds)
+- Some integration tests (seconds)
+- Few E2E tests (minutes)
+- Fast feedback loops enable TDD
+
+**✓ Make Invalid States Unrepresentable**
+- Use type system + schemas to prevent errors
+- Function calling enforces structure
+- Validation happens before state mutation
+
+### Boundary Rules
+
+| Component | Can Access | Cannot Access |
+|-----------|-----------|---------------|
+| `menu_validation.py` | Menu data (parameter) | Nothing (pure functions) |
+| `MenuProvider` | Menu JSON file | Order state, LLM |
+| `OrderStateManager` | Order state, file I/O | Menu data, LLM, validation logic |
+| `OrderTools` | OrderStateManager, MenuProvider, menu_validation | LLM internals |
+| `DriveThruLLM` | MenuProvider, wrapped LLM | Order state, validation |
+| `DriveThruAgent` | Everything (orchestrator) | N/A |
+
+**Dependency Flow** (always downward, never circular):
+```
+DriveThruAgent
+    ├─> OrderStateManager
+    ├─> MenuProvider
+    ├─> OrderTools
+    │       ├─> menu_validation.py
+    │       ├─> OrderStateManager
+    │       └─> MenuProvider
+    └─> DriveThruLLM
+            └─> MenuProvider
+```
+
+### Testing Strategy
+
+**Unit Tests** (Fast, isolated, many)
+- `test_menu_validation.py`: Pure functions, no mocks needed
+- `test_menu_provider.py`: Test with fixture JSON
+- `test_order_state.py`: In-memory state, temp file I/O
+- `test_drive_thru_llm.py`: Mock wrapped LLM
+
+**Integration Tests** (Medium speed, some mocks)
+- `test_order_tools.py`: Real MenuProvider, mock OrderStateManager
+
+**E2E Tests** (Slow, real components, few)
+- `test_drive_thru_agent.py`: Full agent with judge-based evaluation
+- `test_accuracy.py`: Accuracy benchmarks
+
+**Goal**: Unit tests run in <1 second total, enabling rapid TDD cycles.
+
+---
+
 ## 1. System Architecture
 
-### 1.1 Core Components
+### 1.1 Core Components & Data Flow
 
 ```
 Customer Voice Input
     ↓
 [STT] → AssemblyAI Universal Streaming
     ↓
-[Custom DriveThruLLM Wrapper]
-    ├─ Menu Context Provider
-    ├─ Order State Manager
-    ├─ Validation Layer
-    └─ Base LLM (OpenAI GPT-4.1 or similar)
+[AgentSession with DriveThruLLM wrapper]
+    │
+    ├─> DriveThruLLM.chat()
+    │   ├─ Queries MenuProvider for context
+    │   ├─ Injects menu context into chat_ctx
+    │   └─ Delegates to Base LLM (OpenAI GPT-4.1)
+    │
+    ├─> Base LLM outputs function call → add_item_to_order(...)
+    │
+    ├─> OrderTools.add_item_to_order()
+    │   ├─ Calls menu_validation.validate_item() [pure function]
+    │   ├─ If valid: OrderStateManager.add_item() [state mutation]
+    │   │   └─ OrderStateManager appends to incremental log
+    │   └─ Returns result to LLM
+    │
+    └─> LLM generates response text
     ↓
 [TTS] → Inworld/Cartesia
     ↓
-Agent Response
+Agent Voice Response
+
+
+┌─────────────────────────────────────────────────────┐
+│ Dependency Diagram (Composition, not inheritance)  │
+└─────────────────────────────────────────────────────┘
+
+VoiceAgentApp
+    │
+    ├─> Creates: DriveThruAgent (owns conversation)
+    │        │
+    │        ├─> Owns: OrderStateManager (mutable state)
+    │        │
+    │        ├─> Receives: MenuProvider (read-only data)
+    │        │
+    │        └─> Registers: OrderTools (coordination layer)
+    │                  │
+    │                  ├─> Uses: menu_validation.py (pure functions)
+    │                  │
+    │                  ├─> Calls: OrderStateManager (state mutations)
+    │                  │
+    │                  └─> Queries: MenuProvider (data access)
+    │
+    ├─> Creates: DriveThruLLM (wraps base LLM)
+    │        │
+    │        └─> Queries: MenuProvider (for context injection)
+    │
+    └─> Loads: MenuProvider (singleton, immutable)
+
+
+Key Principles:
+- MenuProvider: Read-only, queried by many
+- OrderStateManager: Write-heavy, single owner (DriveThruAgent)
+- menu_validation.py: Pure functions, no dependencies
+- DriveThruLLM: Stateless wrapper, delegates to base LLM
+- OrderTools: Thin coordination layer, receives dependencies
 ```
 
 ### 1.2 New Components to Build
 
-1. **DriveThruLLM** (`src/drive_thru_llm.py`)
-   - Custom LLM wrapper (similar to `KeywordInterceptLLM`)
-   - Wraps a base LLM with order-taking capabilities
-   - Manages conversation state and order tracking
+Each component has a single, well-defined responsibility following the Single Responsibility Principle.
 
-2. **MenuProvider** (`src/menu_provider.py`)
-   - Loads and manages menu data using existing Pydantic models
-   - Provides relevant menu context to LLM
-   - Implements fuzzy matching and search
+#### 1. **DriveThruLLM** (`src/drive_thru_llm.py`)
+**Responsibility**: Pure LLM wrapper - context injection only
+**Does**:
+- Wraps a base LLM (similar to `KeywordInterceptLLM` pattern)
+- Intercepts `chat()` calls to inject relevant menu context into `chat_ctx`
+- Delegates to wrapped LLM
+- Returns LLM stream
 
-3. **OrderStateManager** (`src/order_state_manager.py`)
-   - Tracks items ordered during conversation
-   - Appends to incremental log file after each turn
-   - Generates final JSON output with timestamp
+**Does NOT**:
+- Manage order state (that's `OrderStateManager`)
+- Store any state (stateless wrapper)
+- Validate menu items (that's `menu_validation.py`)
+- Perform searches (that's `MenuProvider`)
 
-4. **MenuValidationTools** (`src/menu_validation.py`)
-   - Validates LLM output against menu items
-   - Fuzzy matching for spoken variations
-   - Modifier validation
+**Why**: Separation of concerns - LLM wrapping is orthogonal to state management
 
-5. **DriveThruAgent** (`src/drive_thru_agent.py`)
-   - Custom Agent subclass with drive-thru specific instructions
-   - Configures the drive-thru persona
+---
+
+#### 2. **MenuProvider** (`src/menu_provider.py`)
+**Responsibility**: Read-only menu data access
+**Does**:
+- Loads menu data from JSON using existing Pydantic models
+- Provides search/query interface: `search_items(keyword)`, `get_category(name)`, `get_item(category, name)`
+- Returns menu data structures (immutable)
+
+**Does NOT**:
+- Modify menu data (read-only)
+- Validate orders (that's `menu_validation.py`)
+- Manage order state (that's `OrderStateManager`)
+- Fuzzy match (that's `menu_validation.py`)
+
+**Why**: Single source of truth for menu data, but purely a data provider
+
+---
+
+#### 3. **OrderStateManager** (`src/order_state_manager.py`)
+**Responsibility**: Single source of truth for order state and persistence
+**Does**:
+- Owns ALL order state (items, quantities, session info)
+- Provides command methods: `add_item()`, `remove_item()`, `clear_order()`, `complete_order()`
+- Provides query methods: `get_items()`, `get_total_count()`, `get_order_summary()`
+- Handles persistence: incremental log (append after each operation), final JSON (on complete)
+- Manages session lifecycle
+
+**Does NOT**:
+- Validate menu items (that's `menu_validation.py` - validation happens before calling OrderStateManager)
+- Search menu (that's `MenuProvider`)
+- Make decisions (it's told what to do)
+
+**Why**: All state changes go through one place - testable, debuggable, single source of truth
+
+---
+
+#### 4. **menu_validation.py** (`src/menu_validation.py`)
+**Responsibility**: Pure validation and matching functions
+**Does**:
+- Provides pure functions: `fuzzy_match_item()`, `validate_item_exists()`, `validate_modifiers()`
+- Fuzzy string matching using `rapidfuzz`
+- Returns validation results (success/failure with details)
+
+**Does NOT**:
+- Store state (pure functions only)
+- Load menu data (receives menu data as parameter)
+- Modify orders (just validates, doesn't change state)
+
+**Why**: Pure functions are maximally testable and reusable
+
+---
+
+#### 5. **OrderTools** (`src/tools/order_tools.py`)
+**Responsibility**: LiveKit Tool definitions for LLM function calling
+**Does**:
+- Defines `add_item_to_order` tool with schema (category, item_name, modifiers, quantity)
+- Defines `complete_order` tool
+- Thin wrappers that orchestrate: validate → add to order state → return result
+- Receives `OrderStateManager` and `MenuProvider` as dependencies
+
+**Does NOT**:
+- Own state (receives OrderStateManager)
+- Implement validation logic (calls menu_validation.py)
+
+**Why**: Tools are the interface between LLM and our system - they coordinate but don't own logic
+
+---
+
+#### 6. **DriveThruAgent** (`src/drive_thru_agent.py`)
+**Responsibility**: Agent orchestration and configuration
+**Does**:
+- Defines agent instructions/persona (system prompt)
+- Owns `OrderStateManager` instance (via composition)
+- Registers tools with agent (passing OrderStateManager as dependency)
+- Coordinates conversation flow
+
+**Does NOT**:
+- Manage state directly (delegates to OrderStateManager)
+- Validate items (delegates to validation layer via tools)
+- Load menu (receives MenuProvider as dependency)
+
+**Why**: Agent is the conductor - it orchestrates but delegates actual work
+
+---
+
+## 1.3 Component Contracts (Interfaces)
+
+Following the Interface Segregation Principle, here are the explicit contracts for each component.
+
+### MenuProvider Interface
+```python
+class MenuProvider:
+    """Read-only menu data provider."""
+
+    def __init__(self, menu_file_path: str) -> None:
+        """Load menu from JSON file."""
+
+    def search_items(self, keyword: str, category: str | None = None) -> list[Item]:
+        """Search for items by keyword, optionally filtered by category."""
+
+    def get_category(self, category_name: str) -> list[Item]:
+        """Get all items in a category."""
+
+    def get_item(self, category_name: str, item_name: str) -> Item | None:
+        """Get a specific item by category and name."""
+
+    def get_all_categories(self) -> list[str]:
+        """Get list of all category names."""
+
+    def get_menu(self) -> Menu:
+        """Get the complete menu (immutable)."""
+```
+
+### OrderStateManager Interface
+```python
+@dataclass
+class OrderItem:
+    """A single item in an order."""
+    item_name: str
+    category: str
+    modifiers: list[str]
+    quantity: int
+    item_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: datetime = field(default_factory=datetime.now)
+
+
+class OrderStateManager:
+    """Single source of truth for order state and persistence."""
+
+    def __init__(self, session_id: str, output_dir: str) -> None:
+        """Initialize order state for a session."""
+
+    def add_item(self, item_name: str, category: str, modifiers: list[str], quantity: int = 1) -> OrderItem:
+        """Add item to order. Returns the created OrderItem. Appends to incremental log."""
+
+    def remove_item(self, item_id: str) -> bool:
+        """Remove item by ID. Returns True if found and removed."""
+
+    def update_item_quantity(self, item_id: str, new_quantity: int) -> bool:
+        """Update quantity for an item. Returns True if found and updated."""
+
+    def get_items(self) -> list[OrderItem]:
+        """Get all items in current order (read-only copy)."""
+
+    def get_total_count(self) -> int:
+        """Get total number of items (accounting for quantities)."""
+
+    def get_order_summary(self) -> str:
+        """Get human-readable order summary."""
+
+    def complete_order(self) -> dict:
+        """Mark order complete and generate final JSON. Returns final order dict."""
+
+    def clear_order(self) -> None:
+        """Clear all items (for cancellation/restart)."""
+```
+
+### menu_validation Module (Pure Functions)
+```python
+@dataclass
+class ValidationResult:
+    """Result of a validation operation."""
+    is_valid: bool
+    matched_item: Item | None = None
+    confidence_score: float = 0.0
+    error_message: str | None = None
+
+
+def fuzzy_match_item(
+    item_name: str,
+    menu_items: list[Item],
+    threshold: int = 85
+) -> ValidationResult:
+    """Fuzzy match an item name against menu items. Returns best match if above threshold."""
+
+
+def validate_item_exists(
+    item_name: str,
+    category: str,
+    menu_provider: MenuProvider
+) -> ValidationResult:
+    """Validate that an item exists in the specified category."""
+
+
+def validate_modifiers(
+    item: Item,
+    requested_modifiers: list[str],
+    fuzzy_threshold: int = 85
+) -> ValidationResult:
+    """Validate that all requested modifiers are available for the item."""
+
+
+def validate_order_item(
+    item_name: str,
+    category: str,
+    modifiers: list[str],
+    menu_provider: MenuProvider,
+    fuzzy_threshold: int = 85
+) -> ValidationResult:
+    """Complete validation: item exists + modifiers valid. Convenience function."""
+```
+
+### OrderTools (LiveKit Tool Definitions)
+```python
+def create_order_tools(
+    order_state: OrderStateManager,
+    menu_provider: MenuProvider,
+    config: DriveThruConfig
+) -> list[Tool]:
+    """Create LiveKit Tool instances with dependencies injected.
+
+    Returns:
+        List of Tool objects that can be registered with an Agent
+    """
+
+    # Tool 1: add_item_to_order
+    # Schema: {category: str, item_name: str, modifiers: list[str], quantity: int}
+    # Behavior: validate → add to state → return confirmation
+
+    # Tool 2: complete_order
+    # Schema: {}
+    # Behavior: complete order → return summary
+```
+
+### DriveThruLLM Interface
+```python
+class DriveThruLLM(LLM):
+    """Stateless LLM wrapper that injects menu context."""
+
+    def __init__(
+        self,
+        wrapped_llm: LLM,
+        menu_provider: MenuProvider,
+        config: DriveThruConfig
+    ) -> None:
+        """Initialize wrapper with dependencies."""
+
+    def chat(
+        self,
+        *,
+        chat_ctx: ChatContext,
+        tools: list[Tool] | None = None,
+        **kwargs
+    ) -> LLMStream:
+        """Intercept chat to inject menu context, then delegate to wrapped LLM."""
+        # 1. Extract keywords from latest user message
+        # 2. Query MenuProvider for relevant items
+        # 3. Inject into chat_ctx as system message or augment existing prompt
+        # 4. Delegate to wrapped_llm.chat()
+```
+
+### DriveThruAgent
+```python
+class DriveThruAgent(Agent):
+    """Drive-thru order taking agent."""
+
+    def __init__(
+        self,
+        order_state: OrderStateManager,
+        menu_provider: MenuProvider,
+        config: DriveThruConfig
+    ) -> None:
+        """Initialize agent with dependencies.
+
+        - Sets instructions/persona
+        - Registers order tools
+        - Owns OrderStateManager
+        """
+```
+
+**Design Principles Applied**:
+1. **Dependency Injection**: Components receive dependencies via constructor, not by creating them
+2. **Interface Segregation**: Each interface is minimal and focused
+3. **Immutability**: MenuProvider returns immutable data; OrderStateManager is the only mutator
+4. **Pure Functions**: `menu_validation.py` has no side effects, fully testable
+5. **Tell, Don't Ask**: Tools tell OrderStateManager what to do, don't query and manipulate
+6. **Single Source of Truth**: All order state lives in OrderStateManager
 
 ---
 
@@ -288,16 +699,24 @@ MENU_ITEM := "Big Mac" | "Quarter Pounder" | ...
 ---
 
 #### Strategy 9: Post-Processing Validation Layer
-**Approach**: Validate every LLM output against menu before speaking to customer.
+**Approach**: Validate every LLM output against menu before mutating order state.
 
-**Implementation**:
+**Implementation**: Pure function in `menu_validation.py`
 ```python
-class OrderValidator:
-    def validate_order_item(self, item_name: str, modifiers: list[str]) -> ValidationResult:
-        # Check item exists in menu
-        # Check modifiers are valid for that item
-        # Return corrected version or error
+def validate_order_item(
+    item_name: str,
+    category: str,
+    modifiers: list[str],
+    menu_provider: MenuProvider,
+    fuzzy_threshold: int = 85
+) -> ValidationResult:
+    """Pure function: check item exists + modifiers valid."""
+    # Check item exists in menu
+    # Check modifiers are valid for that item
+    # Return ValidationResult with matched item or error
 ```
+
+**Component Ownership**: `menu_validation.py` (pure functions)
 
 **Pros**:
 - Last line of defense
@@ -340,21 +759,49 @@ Customer: "I want breakfast"
 
 ---
 
-### Recommended Strategy Combination
+### Recommended Strategy Combination & Component Ownership
+
+Each strategy is owned by a specific component, following SRP.
 
 **Phase 1 (MVP)**:
-1. Function Calling (Strategy 1) - Core structure
-2. Menu Context Injection (Strategy 2) - Grounding
-3. Fuzzy String Matching (Strategy 4) - STT error handling
-4. Post-Processing Validation (Strategy 9) - Safety net
+1. **Function Calling** (Strategy 1)
+   - Owner: `OrderTools` (defines tool schemas)
+   - Core structure for order taking
+
+2. **Menu Context Injection** (Strategy 2)
+   - Owner: `DriveThruLLM` (injects context in chat())
+   - Grounding LLM in actual menu
+
+3. **Fuzzy String Matching** (Strategy 4)
+   - Owner: `menu_validation.py` (pure function)
+   - STT error handling
+
+4. **Post-Processing Validation** (Strategy 9)
+   - Owner: `OrderTools` (validates before state mutation)
+   - Safety net - validate before add_item()
 
 **Phase 2 (Optimization)**:
-5. Explicit Confirmation Loop (Strategy 3) - User validation
-6. Semantic Search (Strategy 5) - Better matching
+5. **Explicit Confirmation Loop** (Strategy 3)
+   - Owner: `DriveThruAgent` (instructions/conversation flow)
+   - User validation
+
+6. **Semantic Search** (Strategy 5)
+   - Owner: `MenuProvider` (add embedding-based search method)
+   - Better matching via semantics
 
 **Phase 3 (Advanced)**:
-7. Two-Stage Parsing (Strategy 6) - If needed
-8. Chain-of-Thought (Strategy 7) - If needed
+7. **Two-Stage Parsing** (Strategy 6)
+   - Owner: `OrderTools` (modify tool implementation)
+   - If needed for complex orders
+
+8. **Chain-of-Thought** (Strategy 7)
+   - Owner: `DriveThruAgent` (modify instructions)
+   - If needed for better reasoning
+
+**Key Insight**: Each strategy lives in exactly one component. This:
+- Makes it easy to A/B test strategies (change one component)
+- Enables independent testing of strategies
+- Prevents strategy logic from leaking across boundaries
 
 ---
 
@@ -417,6 +864,73 @@ When customer says "done" or "that's all":
   "order_summary": "1 Big Mac, 1 Medium Fries"
 }
 ```
+
+### 3.4 Menu Model Enhancements
+
+To support order aggregation and better tracking, the `Item` class in `menus/mcdonalds/models.py` will be enhanced with the following features:
+
+#### 3.4.1 New Fields
+
+1. **quantity field** (`int`, default=1)
+   - Tracks how many of this item are in the order
+   - Default value is 1 for single items
+   - Used for aggregating duplicate items
+
+2. **item_id field** (`str`)
+   - Unique identifier for each item instance
+   - Auto-generated UUID to distinguish between item instances
+   - Allows tracking individual items even with same name and modifiers
+
+#### 3.4.2 Item Addition (`__add__` method)
+
+Implements addition operator for combining items. Two items can be added if and only if:
+
+**Conditions**:
+- `item1.item_name == item2.item_name` (exact name match)
+- `set(item1.modifiers) == set(item2.modifiers)` (same modifiers, order doesn't matter)
+
+**Behavior**:
+- If conditions are met: Create new item with `quantity = item1.quantity + item2.quantity`
+- If conditions are not met: Raise `ValueError` with descriptive message
+
+**Example Usage**:
+```python
+# Create two identical Big Macs
+item1 = Item(
+    category_name="Beef & Pork",
+    item_name="Big Mac",
+    available_as_base=True,
+    quantity=1
+)
+
+item2 = Item(
+    category_name="Beef & Pork",
+    item_name="Big Mac",
+    available_as_base=True,
+    quantity=2
+)
+
+# Add them together
+combined = item1 + item2  # quantity=3
+
+# Items with different modifiers cannot be added
+item3 = Item(
+    category_name="Beef & Pork",
+    item_name="Big Mac",
+    available_as_base=True,
+    quantity=1
+)
+item3.add_modifier("No Pickles")
+
+# This will raise ValueError
+combined = item1 + item3  # Error! Different modifiers
+```
+
+**Implementation Notes**:
+- Modifier comparison uses set equality, so order doesn't matter
+- The new combined item gets a new `item_id`
+- Original items remain unchanged
+- This enables order consolidation: "Two Big Macs" + "One Big Mac" = "Three Big Macs"
 
 ---
 
@@ -562,28 +1076,154 @@ Target: 95%+ accuracy on all metrics
 
 ## 6. Implementation Phases
 
-### Phase 1: Core Infrastructure (2-3 days)
-- [ ] Create `MenuProvider` class
-- [ ] Create `OrderStateManager` class
-- [ ] Create basic `DriveThruLLM` wrapper
-- [ ] Implement function calling for `add_item_to_order`
-- [ ] Set up order file output (incremental + final)
-- [ ] Write basic unit tests for each component
+### Phase 1: Core Infrastructure (Build from bottom up, test-first)
 
-### Phase 2: Accuracy Strategies - MVP (3-4 days)
-- [ ] Implement Strategy 1: Function Calling
-- [ ] Implement Strategy 2: Menu Context Injection
-- [ ] Implement Strategy 4: Fuzzy String Matching
-- [ ] Implement Strategy 9: Post-Processing Validation
-- [ ] Write tests for each strategy
-- [ ] Measure baseline accuracy
+**Principle**: Start with components that have no dependencies (pure functions, data models), then build upward.
 
-### Phase 3: Agent Integration (2 days)
-- [ ] Create `DriveThruAgent` with proper instructions
-- [ ] Integrate with `VoiceAgentApp`
-- [ ] Add configuration options to `config.py`
-- [ ] Test end-to-end in console mode
-- [ ] Fix bugs and edge cases
+#### Step 1.1: Menu Models & Validation (No dependencies)
+- [ ] Enhance `Item` class with `quantity` field (default=1)
+- [ ] Enhance `Item` class with `item_id` field (UUID)
+- [ ] Implement `__add__` method for `Item` class
+- [ ] Write unit tests for `Item` enhancements
+  - Test addition with same modifiers
+  - Test addition failure with different modifiers
+  - Test quantity field defaults
+
+#### Step 1.2: Pure Functions (No dependencies)
+- [ ] Implement `menu_validation.py` with pure functions
+  - `fuzzy_match_item()`
+  - `validate_item_exists()`
+  - `validate_modifiers()`
+  - `validate_order_item()`
+- [ ] Write comprehensive unit tests for validation functions
+  - Fast, deterministic, no I/O
+  - Test edge cases: empty inputs, exact matches, fuzzy matches, no matches
+
+#### Step 1.3: Read-Only Data Provider (Depends on: Item models)
+- [ ] Implement `MenuProvider` class
+  - Constructor loads JSON
+  - `search_items()`, `get_category()`, `get_item()`
+  - All methods return immutable data
+- [ ] Write unit tests for MenuProvider
+  - Use fixture JSON file
+  - Test search, category queries, item lookups
+  - Verify immutability (mutations don't affect provider)
+
+#### Step 1.4: Stateful Order Manager (Depends on: OrderItem dataclass)
+- [ ] Define `OrderItem` dataclass
+- [ ] Implement `OrderStateManager` class
+  - `add_item()`, `remove_item()`, `update_item_quantity()`
+  - `get_items()`, `get_total_count()`, `get_order_summary()`
+  - `complete_order()`, `clear_order()`
+  - Incremental logging (append to JSONL after each mutation)
+  - Final JSON generation
+- [ ] Write unit tests for OrderStateManager
+  - Test in-memory state operations (fast)
+  - Test file I/O separately (use temp directory)
+  - Verify incremental log appends correctly
+  - Verify final JSON structure
+
+#### Step 1.5: Verify Boundaries
+- [ ] Ensure MenuProvider has no mutable state
+- [ ] Ensure OrderStateManager is single source of truth
+- [ ] Ensure validation functions are pure (no I/O, no side effects)
+- [ ] Run all unit tests - should be fast (<1 second total)
+
+### Phase 2: Coordination Layer (Build tools and wrappers)
+
+**Principle**: Now that we have testable components, build the coordination layer that wires them together.
+
+#### Step 2.1: LLM Tools (Depends on: OrderStateManager, MenuProvider, menu_validation)
+- [ ] Implement `create_order_tools()` in `src/tools/order_tools.py`
+  - Define `add_item_to_order` tool schema
+    - Parameters: category, item_name, modifiers, quantity
+    - Description optimized for LLM understanding
+  - Implement tool function:
+    ```python
+    # 1. Validate using menu_validation.validate_order_item()
+    # 2. If valid: order_state.add_item()
+    # 3. Return structured confirmation
+    ```
+  - Define `complete_order` tool schema
+  - Implement tool function: calls order_state.complete_order()
+- [ ] Write integration tests for order_tools
+  - Mock OrderStateManager, real MenuProvider
+  - Verify validation is called before state mutation
+  - Verify tool returns proper schema
+  - Test invalid inputs (should not mutate state)
+
+#### Step 2.2: LLM Wrapper (Depends on: MenuProvider)
+- [ ] Implement `DriveThruLLM` wrapper
+  - Constructor: receives wrapped_llm, menu_provider, config
+  - `chat()` method:
+    ```python
+    # 1. Extract keywords from latest user message
+    # 2. Query menu_provider.search_items(keyword)
+    # 3. Inject relevant items into chat_ctx (augment system message)
+    # 4. Delegate to wrapped_llm.chat()
+    ```
+  - Keep wrapper STATELESS
+- [ ] Write unit tests for DriveThruLLM
+  - Mock wrapped LLM
+  - Verify menu context is injected into chat_ctx
+  - Verify delegation to wrapped LLM
+  - No state stored in wrapper
+
+#### Step 2.3: Accuracy Strategies (Implement within existing components)
+- [ ] Strategy 1: Function Calling - Already implemented in OrderTools ✓
+- [ ] Strategy 2: Menu Context Injection - Implemented in DriveThruLLM
+- [ ] Strategy 4: Fuzzy String Matching - Implemented in menu_validation.py
+- [ ] Strategy 9: Post-Processing Validation - Implemented in OrderTools (validate before add)
+- [ ] Verify all strategies are in place
+- [ ] Document which component owns which strategy
+
+### Phase 3: Agent Integration (Wire everything together)
+
+**Principle**: Agent is the orchestrator - it owns dependencies and wires them together.
+
+#### Step 3.1: Agent Implementation (Depends on: All components from Phase 1 & 2)
+- [ ] Implement `DriveThruAgent` class
+  - Constructor receives: order_state, menu_provider, config
+  - Sets drive-thru specific instructions (system prompt)
+  - Registers tools: `create_order_tools(order_state, menu_provider, config)`
+  - Agent OWNS OrderStateManager (composition)
+  - Agent RECEIVES MenuProvider (dependency injection)
+- [ ] Define agent instructions/persona
+  - Concise, friendly, efficient
+  - Clear about when to use tools
+  - Handles confirmation flow
+
+#### Step 3.2: App-Level Wiring (Depends on: DriveThruAgent, DriveThruLLM)
+- [ ] Add `DriveThruConfig` to `src/config.py`
+  - menu_file_path, orders_output_dir
+  - fuzzy_match_threshold, max_context_items
+  - enable_confirmation_loop, enable_semantic_search
+- [ ] Create `DriveThruVoiceAgentApp` (or extend `VoiceAgentApp`)
+  - Instantiate MenuProvider (singleton, loaded once)
+  - Wrap base LLM with DriveThruLLM (injecting MenuProvider)
+  - Create OrderStateManager for each session (session_handler)
+  - Create DriveThruAgent (injecting order_state and menu_provider)
+  - Wire to SessionHandler
+- [ ] Verify dependency flow:
+  ```
+  App creates MenuProvider (singleton)
+     ├─> Injects into DriveThruLLM wrapper
+     ├─> Injects into DriveThruAgent
+     └─> Injects into OrderTools
+
+  App creates OrderStateManager per session
+     ├─> Owned by DriveThruAgent
+     └─> Passed to OrderTools
+  ```
+
+#### Step 3.3: Integration Testing
+- [ ] Write integration test: OrderTools + OrderStateManager + MenuProvider
+  - No mocked components, real coordination
+  - Verify end-to-end flow: validate → add → log
+- [ ] Test console mode end-to-end
+  - Use mock LLM or real LLM with simple prompts
+  - Verify order state is persisted correctly
+  - Verify incremental logs and final JSON
 
 ### Phase 4: Testing & Refinement (2-3 days)
 - [ ] Write comprehensive test suite (20+ tests)
@@ -604,27 +1244,61 @@ Target: 95%+ accuracy on all metrics
 
 ```
 src/
-├── drive_thru_agent.py          # DriveThruAgent class
-├── drive_thru_llm.py            # DriveThruLLM wrapper
-├── menu_provider.py             # Menu loading and search
-├── order_state_manager.py       # Order tracking and output
-├── menu_validation.py           # Validation utilities
+├── drive_thru_agent.py          # Agent orchestration (owns OrderStateManager)
+├── drive_thru_llm.py            # LLM wrapper (stateless context injection)
+├── menu_provider.py             # Menu data provider (read-only)
+├── order_state_manager.py       # Order state + persistence (single source of truth)
+├── menu_validation.py           # Pure validation functions
 └── tools/
-    └── order_tools.py           # LLM function definitions
+    ├── __init__.py
+    └── order_tools.py           # LiveKit Tool definitions (coordination layer)
 
 tests/
-├── test_drive_thru_agent.py     # End-to-end agent tests
-├── test_menu_provider.py        # Menu search tests
-├── test_order_state.py          # Order state management tests
-└── test_accuracy.py             # Accuracy benchmarks
+├── test_menu_validation.py      # Unit tests for pure functions (fast)
+├── test_menu_provider.py        # Unit tests for menu queries (fast)
+├── test_order_state.py          # Unit tests for state management (fast)
+├── test_drive_thru_llm.py       # Unit tests for LLM wrapper (fast, mocked LLM)
+├── test_order_tools.py          # Integration tests for tools (medium)
+├── test_drive_thru_agent.py     # End-to-end agent tests (slow, uses real LLM/judge)
+└── test_accuracy.py             # Accuracy benchmarks (slow)
 
 orders/
 ├── {session_id}/
 │   ├── incremental_log.jsonl    # Per-turn logging
 │   └── final_order.json         # Final order output
 
+menus/
+└── mcdonalds/
+    ├── models.py                # Pydantic models (Item, Modifier, Menu)
+    └── transformed-data/
+        └── menu-structure-2026-01-21.json
+
 plan/
 └── mcdonalds-drive-thru-agent-plan.md  # This document
+
+
+Test Pyramid (following best practices):
+┌─────────────┐
+│  E2E Tests  │  ← Few, slow, test full agent behavior
+├─────────────┤
+│ Integration │  ← Some, medium, test component interactions
+├─────────────┤
+│ Unit Tests  │  ← Many, fast, test isolated components
+└─────────────┘
+
+Unit tests should be:
+- Fast (no I/O, no real LLM calls)
+- Isolated (test one component at a time)
+- Deterministic (no randomness, no flakiness)
+
+Integration tests should:
+- Use real components but mock expensive dependencies (e.g., mock LLM)
+- Test interactions between 2-3 components
+
+E2E tests should:
+- Use judge-based evaluation for natural language
+- Cover critical user paths
+- Be fewer in number (expensive to run)
 ```
 
 ---
@@ -741,20 +1415,147 @@ After initial implementation, consider:
 
 ## 12. Key Design Decisions
 
+### Why Separate DriveThruLLM from OrderStateManager?
+**Principle**: Single Responsibility Principle (SRP)
+
+LLM wrapping (context injection) is orthogonal to state management. By separating:
+- DriveThruLLM can be tested with mock LLM (fast unit tests)
+- OrderStateManager can be tested without LLM (fast unit tests)
+- Each component has one reason to change
+- Components can be swapped independently (e.g., try different context injection strategies)
+
+### Why Pure Functions for Validation?
+**Principle**: Functional Core, Imperative Shell
+
+Pure functions are maximally testable:
+- No I/O, no side effects
+- Deterministic outputs for same inputs
+- Fast to execute (no database, no API calls)
+- Easy to reason about
+- Can be reused anywhere
+
+This enables Test-Driven Development: write test first, implement function, iterate quickly.
+
+### Why MenuProvider Returns Immutable Data?
+**Principle**: Immutability Reduces Bugs
+
+If MenuProvider returned mutable references:
+- Callers could accidentally modify menu data
+- Hard to track down where menu was corrupted
+- Thread safety issues in concurrent sessions
+
+By returning immutable copies:
+- Menu data is protected from accidental mutation
+- Single source of truth guaranteed
+- Easier to reason about data flow
+
+### Why OrderStateManager is the Only State Owner?
+**Principle**: Single Source of Truth (SSOT)
+
+All order mutations flow through one place:
+- Easy to add logging/auditing
+- Persistence logic centralized
+- Impossible to have inconsistent state
+- Debugging is straightforward: check one component
+- Testing is simple: verify state before/after
+
+Contrast with diffused state (anti-pattern):
+- State scattered across DriveThruLLM, tools, agent
+- Hard to debug: "Where did this item come from?"
+- Hard to test: need to set up multiple components
+- Brittle: changes ripple across multiple components
+
+### Why Tools are Thin Coordination Layer?
+**Principle**: Tell, Don't Ask
+
+Tools coordinate but don't implement logic:
+```python
+# Good (coordination)
+def add_item_to_order_tool(...):
+    result = validate_order_item(...)  # Ask validation layer
+    if result.is_valid:
+        order_state.add_item(...)      # Tell state manager
+    return confirmation
+
+# Bad (implementation leaking into tool)
+def add_item_to_order_tool(...):
+    # Fuzzy matching logic here
+    # Modifier validation logic here
+    # File I/O logic here
+    # Now tool is hard to test and has multiple responsibilities
+```
+
 ### Why Function Calling?
+**Principle**: Make Invalid States Unrepresentable
+
 Function calling provides structured output that's easy to validate and parse. It forces the LLM to think in terms of discrete actions rather than free-form text, reducing ambiguity.
 
+Schema enforcement means: "If it parses, it's valid" (or close to it).
+
 ### Why Multiple Strategies?
-No single strategy achieves 100% accuracy. Layering multiple complementary strategies (function calling + fuzzy matching + validation) creates a robust system.
+**Principle**: Defense in Depth
+
+No single strategy achieves 100% accuracy. Layering multiple complementary strategies (function calling + fuzzy matching + validation) creates a robust system where failures at one level are caught by another.
 
 ### Why Confirmation Loop?
-Voice AI has inherent uncertainty (STT errors, LLM mistakes). Confirming each item catches errors before they compound.
+**Principle**: Human-in-the-Loop
+
+Voice AI has inherent uncertainty (STT errors, LLM mistakes). Confirming each item catches errors before they compound. Cheaper to fix early than to remake entire order.
 
 ### Why Incremental Logging?
-Provides an audit trail and debugging information. If final order is wrong, we can trace back through the conversation.
+**Principle**: Observability & Debuggability
+
+Provides an audit trail and debugging information. If final order is wrong, we can trace back through the conversation to see where it went wrong.
+
+Enables data-driven improvement: analyze logs to find common error patterns.
 
 ### Why Focus on Accuracy Over Speed?
+**Principle**: Correctness First, Optimization Second
+
 Wrong orders are worse than slow orders. Once accuracy is proven, we can optimize for latency.
+
+Premature optimization is the root of all evil. Get it working, get it right, then make it fast.
+
+### Why Test Pyramid (Many Unit, Few E2E)?
+**Principle**: Fast Feedback Loops (Continuous Delivery)
+
+Unit tests:
+- Run in milliseconds
+- Give instant feedback
+- Pinpoint exact failure
+- Enable rapid iteration
+
+E2E tests:
+- Run in seconds/minutes
+- Slow feedback
+- Hard to debug failures
+- Necessary but expensive
+
+Build on solid foundation of fast unit tests, use E2E tests for critical paths only.
+
+### Why Dependency Injection?
+**Principle**: Inversion of Control (IoC)
+
+Components receive dependencies rather than creating them:
+- Easy to substitute mocks for testing
+- Easy to swap implementations (e.g., different LLM, different storage)
+- Explicit dependencies (no hidden coupling)
+- Testable in isolation
+
+```python
+# Good (DI)
+class DriveThruAgent:
+    def __init__(self, order_state: OrderStateManager, menu: MenuProvider):
+        self.order_state = order_state  # Injected
+        self.menu = menu                # Injected
+
+# Bad (hidden dependencies)
+class DriveThruAgent:
+    def __init__(self):
+        self.order_state = OrderStateManager()  # Hard-coded
+        self.menu = MenuProvider()              # Hard-coded
+        # Now can't test with mocks, can't swap implementations
+```
 
 ---
 
