@@ -150,6 +150,82 @@ uv run pytest
 
 
 
+## McDonald's Menu Models
+
+This project includes Pydantic v2 models for representing McDonald's menu data, designed to provide structured menu information to the LLM agent.
+
+### Models
+
+The menu system consists of three main models located in `menus/mcdonalds/models.py`:
+
+- **Modifier**: Represents a menu item variation/modifier
+  - `modifier_name: str` - Name of the modifier (e.g., "Egg Whites", "Cheese")
+  - `modifier_id: str` - Auto-generated UUID for each modifier
+
+- **Item**: Represents a menu item
+  - `category_name: str` - Category (e.g., "Breakfast", "Beef & Pork")
+  - `item_name: str` - Item name (e.g., "Big Mac")
+  - `available_as_base: bool` - Whether item can be ordered without modifications
+  - `modifiers: list[Modifier]` - Available variations for this item
+
+- **Menu**: Complete menu structure
+  - `categories: dict[str, list[Item]]` - All items organized by category
+  - Helper methods for accessing and manipulating menu items
+
+### Usage
+
+```python
+from menus.mcdonalds.models import Menu
+
+# Load the menu from the JSON file
+menu = Menu.load_from_file("menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json")
+
+# Access items by category
+breakfast_items = menu.get_category("Breakfast")
+
+# Get a specific item
+big_mac = menu.get_item("Beef & Pork", "Big Mac")
+
+# Add new items
+from menus.mcdonalds.models import Item
+new_item = Item(
+    category_name="Breakfast",
+    item_name="New Item",
+    available_as_base=True
+)
+new_item.add_modifier("Extra Cheese")
+menu.add_item(new_item)
+
+# Save modified menu
+menu.save_to_file("updated_menu.json")
+```
+
+### Serialization
+
+All models support JSON serialization and deserialization:
+
+```python
+# Serialize individual items or modifiers
+json_str = item.to_json()
+item = Item.from_json(json_str)
+
+# Serialize entire menu
+json_str = menu.to_json()
+menu = Menu.from_json(json_str)
+
+# Save/Load from files
+menu.save_to_file("output.json")
+menu = Menu.load_from_file("menu-structure-2026-01-21.json")
+```
+
+### Testing
+
+Run the menu model tests:
+
+```console
+uv run python -m pytest tests/test_menu_models.py -v
+```
+
 ## Deploying to production
 
 This project is production-ready and includes a working `Dockerfile`. To deploy it to LiveKit Cloud or another environment, see the [deploying to production](https://docs.livekit.io/agents/ops/deployment/) guide.
