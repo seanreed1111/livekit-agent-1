@@ -12,6 +12,66 @@ All app-level code is in the `src/` directory. In general, simple agents can be 
 
 Be sure to maintain code formatting. You can use the ruff formatter/linter as needed: `uv run ruff format` and `uv run ruff check`.
 
+## Data Models
+
+**IMPORTANT: Prefer Pydantic v2 models over dataclasses in greenfield implementations**
+
+When creating new data structures, use Pydantic v2 models instead of dataclasses. Pydantic provides:
+
+- **Runtime validation**: Automatic type checking and data validation at runtime
+- **JSON serialization**: Built-in `.model_dump()` and `.model_dump_json()` methods
+- **Schema generation**: Automatic JSON Schema generation for API documentation
+- **Environment variables**: Integration with `pydantic-settings` for configuration
+- **Better IDE support**: Enhanced autocomplete and type hints
+- **Extensibility**: Easy customization with validators, computed fields, and serializers
+
+### Example
+
+```python
+from pydantic import BaseModel, Field, field_validator
+from typing import Optional
+
+# ✓ Preferred: Pydantic v2 model
+class MenuItem(BaseModel):
+    name: str
+    price: float = Field(gt=0, description="Price must be positive")
+    category: str
+    available: bool = True
+
+    @field_validator('name')
+    @classmethod
+    def name_must_not_be_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError('Name cannot be empty')
+        return v
+
+# ✗ Avoid in greenfield code: dataclass
+from dataclasses import dataclass
+
+@dataclass
+class MenuItem:
+    name: str
+    price: float
+    category: str
+    available: bool = True
+```
+
+### When to use dataclasses
+
+Only use dataclasses when:
+- Working with existing code that already uses dataclasses
+- The data structure is purely internal and doesn't need validation or serialization
+- You need specific dataclass features incompatible with Pydantic
+
+### Migration from dataclasses
+
+When refactoring existing dataclasses to Pydantic models:
+1. Replace `@dataclass` with `class ModelName(BaseModel)`
+2. Add type hints for all fields
+3. Add validation rules using `Field()` and validators as needed
+4. Update serialization code to use `.model_dump()` and `.model_dump_json()`
+5. Update tests to verify validation behavior
+
 ## Package Management with `uv`
 
 **IMPORTANT:** This project uses `uv` as its package manager. You must **always** use `uv` commands instead of `pip` or bare `python` commands.
@@ -121,7 +181,92 @@ If you use the LiveKit Docs MCP Server to search or browse documentation, also s
 - When asked to write BDD scenarios or feature files, they should be written in Gherkin language
 - Only implement steps corresponding to the scenarios when explicitly told to do so
 - When writing authorization/authentication scenarios, write only a minimal set of five or less unless explicitly told otherwise
-  
+
+### Pytest Fixtures and Test Organization
+
+**IMPORTANT: All reusable pytest fixtures must be placed in `tests/conftest.py`**
+
+This ensures:
+- **Maximum reusability**: Fixtures defined in `conftest.py` are automatically available to all test modules without importing
+- **Single source of truth**: No duplicate fixture definitions across test files
+- **Test clarity**: Test files focus on test logic rather than setup boilerplate
+- **Maintainability**: Changes to fixtures only need to be made in one place
+
+#### Guidelines:
+- Place all fixtures in `tests/conftest.py`, even if currently used by only one test module
+- Group related fixtures together with clear section headers (e.g., "Menu Data Fixtures", "Item Fixtures")
+- Use descriptive fixture names that indicate what they provide
+- Document each fixture with a clear docstring explaining its purpose
+- Test files should import only the functions/classes being tested, never fixtures
+
+#### Example conftest.py structure:
+```python
+"""Shared pytest fixtures for all test modules."""
+
+import pytest
+
+# ============================================================================
+# Data Fixtures
+# ============================================================================
+
+@pytest.fixture
+def sample_data():
+    """Create sample test data."""
+    return {...}
+
+# ============================================================================
+# Object Fixtures
+# ============================================================================
+
+@pytest.fixture
+def sample_object(sample_data):
+    """Create a sample object using sample data."""
+    return Object(sample_data)
+```
+
+
+## Planning Principles
+
+When reviewing or creating implementation plans, adhere to the following principles:
+
+### Consistency and Separation of Concerns
+
+- **Review all plans for consistency**: Ensure naming conventions, patterns, and approaches are uniform throughout the codebase
+- **Sharp boundaries**: Maintain clear, well-defined boundaries between components and modules
+- **Separation of concerns**: Each module, class, or function should have a single, well-defined responsibility
+- **Kent Beck and Dave Farley approach**: Apply rigorous software engineering discipline to planning:
+  - Make the change easy, then make the easy change
+  - Prefer small, incremental steps over large changes
+  - Keep designs simple and avoid unnecessary abstraction
+  - Ensure every component has a clear purpose and minimal dependencies
+  - Focus on continuous improvement and refactoring as you go
+  - Design for testability from the start
+
+When creating plans, explicitly identify:
+- Component boundaries and their responsibilities
+- Dependencies between components
+- Potential coupling that should be avoided
+- Opportunities to simplify the design
+
+## Implementation Tracking
+
+**IMPORTANT: Always check and update implementation checklists**
+
+Before starting any work:
+1. Check `plan/thoughts/README.md` for the **Implementation Status Checklist**
+2. Review what has already been completed to avoid duplicating work
+3. Identify which plan you should work on next based on dependencies
+
+After completing any work:
+1. Update the checklist in `plan/thoughts/README.md` with:
+   - Mark the plan as completed with `[x]`
+   - Add completion date
+   - List key files created/modified
+   - Note test results (number of tests passing, execution time)
+   - Include any important details for future agents
+2. Ensure all changes are saved before finishing your session
+
+This ensures continuity across multiple agent sessions and prevents wasted effort.
 
 ## Architecture Patterns
 

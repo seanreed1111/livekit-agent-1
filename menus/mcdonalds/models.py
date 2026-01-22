@@ -19,6 +19,7 @@ class Modifier(BaseModel):
         modifier_name: The name of the modifier (e.g., "Egg Whites", "Cheese")
         modifier_id: A unique identifier for this modifier (auto-generated UUID)
     """
+
     modifier_name: str
     modifier_id: str = Field(default_factory=lambda: str(uuid4()))
 
@@ -41,11 +42,18 @@ class Item(BaseModel):
         item_name: The name of the item (e.g., "Big Mac")
         available_as_base: Whether the item can be ordered without modifications
         modifiers: List of available modifiers/variations for this item
+        quantity: Number of this item (default: 1)
+        item_id: Unique identifier for this item instance (auto-generated UUID)
     """
+
     category_name: str
     item_name: str
     available_as_base: bool
     modifiers: list[Modifier] = Field(default_factory=list)
+    quantity: int = Field(default=1, description="Number of this item")
+    item_id: str = Field(
+        default_factory=lambda: str(uuid4()), description="Unique identifier"
+    )
 
     def add_modifier(self, modifier_name: str) -> "Modifier":
         """Add a new modifier to this item.
@@ -59,6 +67,47 @@ class Item(BaseModel):
         modifier = Modifier(modifier_name=modifier_name)
         self.modifiers.append(modifier)
         return modifier
+
+    def __add__(self, other: "Item") -> "Item":
+        """Combine two identical items by adding their quantities.
+
+        Items are considered identical if they have the same item_name and the same
+        set of modifiers (order doesn't matter).
+
+        Args:
+            other: Another Item to combine with this one
+
+        Returns:
+            A new Item with combined quantity and a new item_id
+
+        Raises:
+            ValueError: If items have different names or different modifiers
+        """
+        if not isinstance(other, Item):
+            raise TypeError(f"Cannot add Item with {type(other)}")
+
+        if self.item_name != other.item_name:
+            raise ValueError(
+                f"Cannot combine items with different names: '{self.item_name}' and '{other.item_name}'"
+            )
+
+        # Compare modifiers by name (order doesn't matter)
+        self_modifier_names = {m.modifier_name for m in self.modifiers}
+        other_modifier_names = {m.modifier_name for m in other.modifiers}
+
+        if self_modifier_names != other_modifier_names:
+            raise ValueError(
+                f"Cannot combine items with different modifiers: {self_modifier_names} vs {other_modifier_names}"
+            )
+
+        # Create new item with combined quantity
+        return Item(
+            category_name=self.category_name,
+            item_name=self.item_name,
+            available_as_base=self.available_as_base,
+            modifiers=[Modifier(modifier_name=name) for name in self_modifier_names],
+            quantity=self.quantity + other.quantity,
+        )
 
     def to_json(self) -> str:
         """Serialize this item to JSON string."""
@@ -83,6 +132,7 @@ class Menu(BaseModel):
     Attributes:
         categories: Dictionary mapping category names to lists of items
     """
+
     categories: dict[str, list[Item]] = Field(default_factory=dict)
 
     def add_item(self, item: Item) -> None:
@@ -161,7 +211,7 @@ class Menu(BaseModel):
         import json
 
         path = Path(file_path)
-        with path.open('r') as f:
+        with path.open("r") as f:
             data: dict[str, dict[str, Any]] = json.load(f)
 
         menu = cls()
@@ -171,11 +221,11 @@ class Menu(BaseModel):
                 item = Item(
                     category_name=category_name,
                     item_name=item_name,
-                    available_as_base=item_data['available_as_base'],
+                    available_as_base=item_data["available_as_base"],
                     modifiers=[
                         Modifier(modifier_name=variation)
-                        for variation in item_data.get('variations', [])
-                    ]
+                        for variation in item_data.get("variations", [])
+                    ],
                 )
                 menu.add_item(item)
 
@@ -190,5 +240,5 @@ class Menu(BaseModel):
         path = Path(file_path)
         path.parent.mkdir(parents=True, exist_ok=True)
 
-        with path.open('w') as f:
+        with path.open("w") as f:
             f.write(self.to_json())

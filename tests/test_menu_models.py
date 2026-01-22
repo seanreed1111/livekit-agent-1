@@ -81,9 +81,7 @@ class TestItem:
     def test_item_creation_without_modifiers(self):
         """Test creating an item without modifiers."""
         item = Item(
-            category_name="Breakfast",
-            item_name="Egg McMuffin",
-            available_as_base=True
+            category_name="Breakfast", item_name="Egg McMuffin", available_as_base=True
         )
 
         assert item.category_name == "Breakfast"
@@ -95,13 +93,13 @@ class TestItem:
         """Test creating an item with modifiers."""
         modifiers = [
             Modifier(modifier_name="Egg Whites"),
-            Modifier(modifier_name="Hotcakes")
+            Modifier(modifier_name="Hotcakes"),
         ]
         item = Item(
             category_name="Breakfast",
             item_name="Big Breakfast",
             available_as_base=True,
-            modifiers=modifiers
+            modifiers=modifiers,
         )
 
         assert len(item.modifiers) == 2
@@ -113,7 +111,7 @@ class TestItem:
         item = Item(
             category_name="Beef & Pork",
             item_name="Quarter Pounder",
-            available_as_base=True
+            available_as_base=True,
         )
 
         modifier = item.add_modifier("Cheese")
@@ -127,7 +125,7 @@ class TestItem:
             category_name="Breakfast",
             item_name="Egg McMuffin",
             available_as_base=True,
-            modifiers=[Modifier(modifier_name="Cheese", modifier_id="id1")]
+            modifiers=[Modifier(modifier_name="Cheese", modifier_id="id1")],
         )
 
         json_str = item.to_json()
@@ -141,7 +139,7 @@ class TestItem:
 
     def test_item_json_deserialization(self):
         """Test deserializing an item from JSON."""
-        json_str = '''
+        json_str = """
         {
             "category_name": "Breakfast",
             "item_name": "Egg McMuffin",
@@ -150,7 +148,7 @@ class TestItem:
                 {"modifier_name": "Cheese", "modifier_id": "id1"}
             ]
         }
-        '''
+        """
         item = Item.from_json(json_str)
 
         assert item.category_name == "Breakfast"
@@ -167,12 +165,148 @@ class TestItem:
             available_as_base=False,
             modifiers=[
                 Modifier(modifier_name="M&Ms Candies"),
-                Modifier(modifier_name="Oreo Cookies")
-            ]
+                Modifier(modifier_name="Oreo Cookies"),
+            ],
         )
 
         assert item.available_as_base is False
         assert len(item.modifiers) == 2
+
+    def test_item_quantity_defaults_to_one(self):
+        """Test that quantity field defaults to 1."""
+        item = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        assert item.quantity == 1
+
+    def test_item_quantity_can_be_set(self):
+        """Test that quantity can be set during creation."""
+        item = Item(
+            category_name="Beef & Pork",
+            item_name="Big Mac",
+            available_as_base=True,
+            quantity=3,
+        )
+        assert item.quantity == 3
+
+    def test_item_id_is_generated(self):
+        """Test that item_id is auto-generated."""
+        item = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        assert item.item_id is not None
+        assert len(item.item_id) > 0
+
+    def test_item_id_is_unique(self):
+        """Test that each item gets a unique ID."""
+        item1 = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        item2 = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        assert item1.item_id != item2.item_id
+
+    def test_add_identical_items(self):
+        """Test adding two identical items combines their quantities."""
+        item1 = Item(
+            category_name="Beef & Pork",
+            item_name="Big Mac",
+            available_as_base=True,
+            quantity=1,
+        )
+        item2 = Item(
+            category_name="Beef & Pork",
+            item_name="Big Mac",
+            available_as_base=True,
+            quantity=2,
+        )
+        combined = item1 + item2
+
+        assert combined.quantity == 3
+        assert combined.item_name == "Big Mac"
+        assert combined.category_name == "Beef & Pork"
+        # Verify new item_id was generated
+        assert combined.item_id != item1.item_id
+        assert combined.item_id != item2.item_id
+
+    def test_add_items_with_different_names_raises_error(self):
+        """Test that adding items with different names raises ValueError."""
+        item1 = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        item2 = Item(
+            category_name="Beef & Pork",
+            item_name="Quarter Pounder",
+            available_as_base=True,
+        )
+
+        with pytest.raises(
+            ValueError, match="Cannot combine items with different names"
+        ):
+            _ = item1 + item2
+
+    def test_add_items_with_different_modifiers_raises_error(self):
+        """Test that adding items with different modifiers raises ValueError."""
+        item1 = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        item2 = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        item2.add_modifier("No Pickles")
+
+        with pytest.raises(
+            ValueError, match="Cannot combine items with different modifiers"
+        ):
+            _ = item1 + item2
+
+    def test_add_items_with_same_modifiers_different_order(self):
+        """Test that items with same modifiers in different order can be added."""
+        item1 = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        item1.add_modifier("No Pickles")
+        item1.add_modifier("Extra Sauce")
+
+        item2 = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        item2.add_modifier("Extra Sauce")
+        item2.add_modifier("No Pickles")
+
+        combined = item1 + item2
+        assert combined.quantity == 2
+        assert combined.item_name == "Big Mac"
+        # Check that modifiers are preserved
+        modifier_names = {m.modifier_name for m in combined.modifiers}
+        assert modifier_names == {"No Pickles", "Extra Sauce"}
+
+    def test_add_items_with_same_modifiers(self):
+        """Test adding items with identical modifiers."""
+        item1 = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        item1.add_modifier("No Pickles")
+
+        item2 = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+        item2.add_modifier("No Pickles")
+
+        combined = item1 + item2
+        assert combined.quantity == 2
+        modifier_names = {m.modifier_name for m in combined.modifiers}
+        assert modifier_names == {"No Pickles"}
+
+    def test_add_items_with_non_item_raises_error(self):
+        """Test that adding an item with a non-Item type raises TypeError."""
+        item = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
+
+        with pytest.raises(TypeError, match="Cannot add Item with"):
+            _ = item + "not an item"
 
 
 class TestMenu:
@@ -188,14 +322,10 @@ class TestMenu:
         """Test adding items to the menu."""
         menu = Menu()
         item1 = Item(
-            category_name="Breakfast",
-            item_name="Egg McMuffin",
-            available_as_base=True
+            category_name="Breakfast", item_name="Egg McMuffin", available_as_base=True
         )
         item2 = Item(
-            category_name="Breakfast",
-            item_name="Hash Brown",
-            available_as_base=True
+            category_name="Breakfast", item_name="Hash Brown", available_as_base=True
         )
 
         menu.add_item(item1)
@@ -208,8 +338,12 @@ class TestMenu:
     def test_menu_multiple_categories(self):
         """Test menu with multiple categories."""
         menu = Menu()
-        breakfast = Item(category_name="Breakfast", item_name="Egg McMuffin", available_as_base=True)
-        burger = Item(category_name="Beef & Pork", item_name="Big Mac", available_as_base=True)
+        breakfast = Item(
+            category_name="Breakfast", item_name="Egg McMuffin", available_as_base=True
+        )
+        burger = Item(
+            category_name="Beef & Pork", item_name="Big Mac", available_as_base=True
+        )
 
         menu.add_item(breakfast)
         menu.add_item(burger)
@@ -222,8 +356,12 @@ class TestMenu:
     def test_menu_get_category(self):
         """Test retrieving items from a specific category."""
         menu = Menu()
-        item1 = Item(category_name="Breakfast", item_name="Item1", available_as_base=True)
-        item2 = Item(category_name="Breakfast", item_name="Item2", available_as_base=True)
+        item1 = Item(
+            category_name="Breakfast", item_name="Item1", available_as_base=True
+        )
+        item2 = Item(
+            category_name="Breakfast", item_name="Item2", available_as_base=True
+        )
         menu.add_item(item1)
         menu.add_item(item2)
 
@@ -241,7 +379,9 @@ class TestMenu:
     def test_menu_get_item(self):
         """Test retrieving a specific item by category and name."""
         menu = Menu()
-        item = Item(category_name="Breakfast", item_name="Egg McMuffin", available_as_base=True)
+        item = Item(
+            category_name="Breakfast", item_name="Egg McMuffin", available_as_base=True
+        )
         menu.add_item(item)
 
         retrieved = menu.get_item("Breakfast", "Egg McMuffin")
@@ -261,7 +401,7 @@ class TestMenu:
             category_name="Breakfast",
             item_name="Egg McMuffin",
             available_as_base=True,
-            modifiers=[Modifier(modifier_name="Cheese")]
+            modifiers=[Modifier(modifier_name="Cheese")],
         )
         menu.add_item(item)
 
@@ -275,7 +415,7 @@ class TestMenu:
 
     def test_menu_json_deserialization(self):
         """Test deserializing a menu from JSON."""
-        json_str = '''
+        json_str = """
         {
             "categories": {
                 "Breakfast": [
@@ -288,7 +428,7 @@ class TestMenu:
                 ]
             }
         }
-        '''
+        """
         menu = Menu.from_json(json_str)
 
         assert len(menu.categories) == 1
@@ -302,29 +442,23 @@ class TestMenu:
         # Create a temporary JSON file with sample data
         test_data = {
             "Breakfast": {
-                "Egg McMuffin": {
-                    "available_as_base": True,
-                    "variations": []
-                },
+                "Egg McMuffin": {"available_as_base": True, "variations": []},
                 "Big Breakfast": {
                     "available_as_base": True,
-                    "variations": ["Egg Whites", "Hotcakes"]
-                }
+                    "variations": ["Egg Whites", "Hotcakes"],
+                },
             },
             "Beef & Pork": {
-                "Big Mac": {
-                    "available_as_base": True,
-                    "variations": []
-                },
+                "Big Mac": {"available_as_base": True, "variations": []},
                 "Quarter Pounder": {
                     "available_as_base": True,
-                    "variations": ["Cheese", "Bacon"]
-                }
-            }
+                    "variations": ["Cheese", "Bacon"],
+                },
+            },
         }
 
         test_file = tmp_path / "test_menu.json"
-        with open(test_file, 'w') as f:
+        with open(test_file, "w") as f:
             json.dump(test_data, f)
 
         # Load the menu
@@ -363,7 +497,7 @@ class TestMenu:
             category_name="Breakfast",
             item_name="Egg McMuffin",
             available_as_base=True,
-            modifiers=[Modifier(modifier_name="Cheese")]
+            modifiers=[Modifier(modifier_name="Cheese")],
         )
         menu.add_item(item)
 
@@ -383,22 +517,28 @@ class TestMenu:
         assert len(data["categories"]["Breakfast"]) == 1
 
 
-def test_load_actual_menu_file():
+def test_load_actual_menu_file(real_menu_path):
     """Integration test: Load the actual McDonald's menu JSON file."""
-    menu_file = Path(__file__).parent.parent / "menus" / "mcdonalds" / "transformed-data" / "menu-structure-2026-01-21.json"
+    if not real_menu_path.exists():
+        pytest.skip(f"Menu file not found: {real_menu_path}")
 
-    if not menu_file.exists():
-        pytest.skip(f"Menu file not found: {menu_file}")
-
-    menu = Menu.load_from_file(menu_file)
+    menu = Menu.load_from_file(real_menu_path)
 
     # Verify the menu loaded successfully
     assert len(menu.categories) > 0
 
     # Check for expected categories
-    expected_categories = ["Breakfast", "Beef & Pork", "Chicken & Fish", "Beverages", "Coffee & Tea"]
+    expected_categories = [
+        "Breakfast",
+        "Beef & Pork",
+        "Chicken & Fish",
+        "Beverages",
+        "Coffee & Tea",
+    ]
     for category in expected_categories:
-        assert category in menu.get_all_categories(), f"Expected category '{category}' not found"
+        assert category in menu.get_all_categories(), (
+            f"Expected category '{category}' not found"
+        )
 
     # Check a specific item with variations
     big_breakfast = menu.get_item("Breakfast", "Big Breakfast (Large Biscuit)")
@@ -409,7 +549,11 @@ def test_load_actual_menu_file():
     # Check an item that requires modifiers (McFlurry)
     categories = menu.get_all_categories()
     if "Smoothies & Shakes" in categories:
-        mcflurry_items = [item for item in menu.get_category("Smoothies & Shakes") if "McFlurry" in item.item_name]
+        mcflurry_items = [
+            item
+            for item in menu.get_category("Smoothies & Shakes")
+            if "McFlurry" in item.item_name
+        ]
         if mcflurry_items:
             mcflurry = mcflurry_items[0]
             assert mcflurry.available_as_base is False
@@ -426,8 +570,8 @@ def test_round_trip_serialization(tmp_path):
         available_as_base=True,
         modifiers=[
             Modifier(modifier_name="Mod1", modifier_id="id1"),
-            Modifier(modifier_name="Mod2", modifier_id="id2")
-        ]
+            Modifier(modifier_name="Mod2", modifier_id="id2"),
+        ],
     )
     original_menu.add_item(item)
 

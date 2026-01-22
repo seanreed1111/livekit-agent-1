@@ -102,3 +102,57 @@ class SessionHandler:
 
         # Greet the user when they join
         await session.say("Hello! How can I help you today?")
+
+
+class DriveThruSessionHandler:
+    """Handles creation of drive-thru agent sessions."""
+
+    def __init__(self, config):
+        """Initialize session handler with config.
+
+        Args:
+            config: AppConfig instance containing drive-thru configuration
+        """
+        from menu_provider import MenuProvider
+
+        self.config = config
+
+        # Create shared MenuProvider (singleton - loaded once)
+        self.menu_provider = MenuProvider(config.drive_thru.menu_file_path)
+
+        logger.info("DriveThruSessionHandler initialized")
+
+    async def create_agent(self, session_id: str):
+        """Create a new DriveThruAgent for a session.
+
+        Args:
+            session_id: Unique identifier for this session
+
+        Returns:
+            DriveThruAgent instance configured for this session
+        """
+        from drive_thru_agent import DriveThruAgent
+        from drive_thru_llm import DriveThruLLM
+        from factories import create_llm
+
+        # Create base LLM (from config)
+        base_llm = create_llm(self.config.pipeline)
+
+        # Wrap with DriveThruLLM
+        drive_thru_llm = DriveThruLLM(
+            wrapped_llm=base_llm,
+            menu_provider=self.menu_provider,
+            max_context_items=self.config.drive_thru.max_context_items,
+        )
+
+        # Create DriveThruAgent
+        agent = DriveThruAgent(
+            session_id=session_id,
+            llm=drive_thru_llm,
+            menu_provider=self.menu_provider,
+            output_dir=self.config.drive_thru.orders_output_dir,
+        )
+
+        logger.info(f"Created DriveThruAgent for session {session_id}")
+
+        return agent
