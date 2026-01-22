@@ -19,7 +19,7 @@ The original monolithic plan (`mcdonalds-drive-thru-agent-plan.md`) has been ana
 
 ## Implementation Status Checklist
 
-**Last Updated**: 2026-01-21
+**Last Updated**: 2026-01-21 (Plan 06 completed)
 
 Track completion of all implementation plans. Check off each plan as it's completed and verified.
 
@@ -74,12 +74,36 @@ Track completion of all implementation plans. Check off each plan as it's comple
   - Tests: `tests/test_drive_thru_llm.py`
   - Depends on: Plan 02
 
-- [ ] **Plan 06: DriveThruAgent**
-  - Not yet started
+- [x] **Plan 06: DriveThruAgent** ✅ COMPLETED
+  - Created `DriveThruAgent` orchestration class extending LiveKit Agent
+  - Implemented component wiring: owns OrderStateManager, receives MenuProvider and DriveThruLLM via DI
+  - Implemented comprehensive agent instructions and persona
+  - Provided properties for accessing agent, order_state, llm, and tools
+  - 6 unit tests passing (agent initialization, wiring, ownership)
+  - 8 integration tests passing (tool integration, order workflows, error handling)
+  - 14 total tests passing in 0.40s
+  - Files: `src/drive_thru_agent.py`
+  - Tests: `tests/test_drive_thru_agent.py`, `tests/test_drive_thru_agent_integration.py`
+  - Fixtures added to: `tests/conftest.py`
   - Depends on: Plans 02, 03, 04, 05
 
-- [ ] **Plan 07: Integration and Wiring**
-  - Not yet started
+- [x] **Plan 07: Integration and Wiring** ✅ COMPLETED (2026-01-21)
+  - Added `DriveThruConfig` to `src/config.py` with menu path, output dir, fuzzy match threshold, and feature flags
+  - Created `DriveThruSessionHandler` in `src/session_handler.py` for session management
+  - Created `src/agent.py` as CLI entry point with commands: console, dev, start, download-files
+  - Created BDD feature files (6 files total):
+    - `tests/features/agent/01_basic_ordering.feature` (3 scenarios)
+    - `tests/features/agent/02_multi_item_ordering.feature` (3 scenarios)
+    - `tests/features/agent/03_modifiers.feature` (4 scenarios)
+    - `tests/features/agent/04_order_corrections.feature` (3 scenarios)
+    - `tests/features/agent/05_error_handling.feature` (4 scenarios)
+    - `tests/features/agent/06_order_completion.feature` (4 scenarios)
+  - Total: 21 BDD scenarios defined
+  - Added dependencies: click, pytest-bdd
+  - CLI tested and operational
+  - Files: `src/config.py` (modified), `src/session_handler.py` (modified), `src/agent.py` (new)
+  - Feature files: `tests/features/agent/*.feature` (6 files)
+  - Note: BDD step definitions and test execution deferred (user preference)
   - Depends on: Plans 01-06
 
 - [ ] **Plan 08: Accuracy Optimization**

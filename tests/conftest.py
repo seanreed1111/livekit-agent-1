@@ -220,3 +220,66 @@ def order_tools(order_state_manager, menu_provider):
     from src.tools.order_tools import create_order_tools
 
     return create_order_tools(order_state_manager, menu_provider)
+
+
+# ============================================================================
+# DriveThruLLM Fixtures
+# ============================================================================
+
+
+@pytest.fixture
+def mock_drive_thru_llm():
+    """Create a mock DriveThruLLM for testing."""
+    from unittest.mock import Mock
+    from src.drive_thru_llm import DriveThruLLM
+
+    return Mock(spec=DriveThruLLM)
+
+
+@pytest.fixture
+def drive_thru_llm(real_menu_provider):
+    """Create real DriveThruLLM with menu context injection."""
+    from unittest.mock import Mock
+    from livekit.agents.llm import LLM
+    from src.drive_thru_llm import DriveThruLLM
+
+    # Create a mock base LLM
+    mock_base_llm = Mock(spec=LLM)
+
+    # Wrap it in DriveThruLLM
+    return DriveThruLLM(
+        wrapped_llm=mock_base_llm,
+        menu_provider=real_menu_provider,
+        max_context_items=50
+    )
+
+
+# ============================================================================
+# DriveThruAgent Fixtures
+# ============================================================================
+
+
+@pytest.fixture
+def drive_thru_agent(mock_drive_thru_llm, real_menu_provider, tmp_path):
+    """Create DriveThruAgent with mock LLM for testing."""
+    from src.drive_thru_agent import DriveThruAgent
+
+    return DriveThruAgent(
+        session_id="test-agent-session",
+        llm=mock_drive_thru_llm,
+        menu_provider=real_menu_provider,
+        output_dir=str(tmp_path / "orders")
+    )
+
+
+@pytest.fixture
+def real_drive_thru_agent(drive_thru_llm, real_menu_provider, tmp_path):
+    """Create DriveThruAgent with real DriveThruLLM for E2E tests."""
+    from src.drive_thru_agent import DriveThruAgent
+
+    return DriveThruAgent(
+        session_id="test-e2e-session",
+        llm=drive_thru_llm,
+        menu_provider=real_menu_provider,
+        output_dir=str(tmp_path / "orders")
+    )
