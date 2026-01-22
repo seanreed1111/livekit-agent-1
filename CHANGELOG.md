@@ -1,5 +1,49 @@
 # Changelog
 
+## PR #10: Fix Drive-Thru Agent Responsiveness (January 22, 2026)
+
+**Commit:** 1e2687b
+**Branch:** `debug-session`
+**Files changed:** 2 files (+98 lines, -162 lines)
+
+### 🐛 Bug Fixes
+
+#### Critical: Agent Now Responds to Customer Orders
+- **Fixed tool registration bug** - The drive-thru agent was greeting customers but not responding to their orders. Root cause: order management tools (add_item_to_order, complete_order, remove_item_from_order) were created but never passed to the LiveKit Agent parent class.
+  - **What was broken**: Agent would say "Welcome to McDonald's! What can I get for you today?" but become unresponsive when customers placed orders
+  - **What's fixed**: Agent now properly calls tools to add items, confirm orders, and save final orders to JSON
+  - **Technical change**: Reordered `DriveThruAgent.__init__()` to create tools before calling `super().__init__()` and pass them via `tools` parameter
+  - **Impact**: Agent can now complete full ordering workflows from greeting to order completion
+
+### 🔍 Improvements
+
+#### Enhanced Diagnostic Logging
+- **Tool registration verification** - Added logging to confirm 3 tools are registered when agent starts
+  - Logs show "Agent has 3 tools available" in both console and dev modes
+  - Helps diagnose similar issues in the future
+  - Implemented in `src/drive_thru_agent.py` and `src/agent.py`
+
+### Technical Details
+
+**Root Cause Analysis:**
+- Location: `src/drive_thru_agent.py:51`
+- Issue: `super().__init__(instructions=...)` called without `tools` parameter
+- Tools created at lines 64-66 but never passed to parent Agent class
+- Result: LLM had no access to ordering functions
+
+**Fix Applied:**
+1. Store dependencies first (llm, menu_provider, session_id)
+2. Create OrderStateManager
+3. Create tools BEFORE calling super().__init__()
+4. Pass tools to parent: `super().__init__(instructions=..., tools=self._tools)`
+
+**Verified Working:**
+- ✅ Console mode: Confirmed "Agent has 3 tools available"
+- ✅ Dev mode: Agent starts and registers with LiveKit Cloud
+- ✅ Tool registration: All 3 tools accessible to LLM
+
+---
+
 ## PR #9: Enhanced Makefile with Minimalism Standards (January 22, 2026)
 
 **Commits:** c808878 to b39200e
