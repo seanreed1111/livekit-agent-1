@@ -12,7 +12,6 @@ import pytest
 from menus.mcdonalds.models import Item, Menu, Modifier
 from src.menu_provider import MenuProvider
 
-
 # ============================================================================
 # Menu Data Fixtures
 # ============================================================================
@@ -172,3 +171,52 @@ def real_menu_path() -> Path:
         / "transformed-data"
         / "menu-structure-2026-01-21.json"
     )
+
+
+# ============================================================================
+# OrderStateManager Fixtures
+# ============================================================================
+
+
+@pytest.fixture
+def temp_output_dir(tmp_path):
+    """Create temporary output directory for order tests."""
+    return str(tmp_path / "orders")
+
+
+@pytest.fixture
+def order_manager(temp_output_dir):
+    """Create OrderStateManager with temp directory."""
+    from src.order_state_manager import OrderStateManager
+
+    return OrderStateManager(session_id="test-session-123", output_dir=temp_output_dir)
+
+
+# ============================================================================
+# OrderTools Fixtures
+# ============================================================================
+
+
+@pytest.fixture
+def menu_provider() -> MenuProvider:
+    """Create MenuProvider with real menu for order tools tests."""
+    menu_path = "menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json"
+    return MenuProvider(menu_path)
+
+
+@pytest.fixture
+def order_state_manager(tmp_path):
+    """Create OrderStateManager with temp directory for order tools tests."""
+    from src.order_state_manager import OrderStateManager
+
+    return OrderStateManager(
+        session_id="test-tools-session", output_dir=str(tmp_path / "orders")
+    )
+
+
+@pytest.fixture
+def order_tools(order_state_manager, menu_provider):
+    """Create order tools with real dependencies for integration tests."""
+    from src.tools.order_tools import create_order_tools
+
+    return create_order_tools(order_state_manager, menu_provider)

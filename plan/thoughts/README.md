@@ -41,12 +41,27 @@ Track completion of all implementation plans. Check off each plan as it's comple
   - Tests: `tests/test_menu_provider.py`
   - Depends on: Plan 01
 
-- [ ] **Plan 03: OrderStateManager**
-  - Not yet started
+- [x] **Plan 03: OrderStateManager** ✅ COMPLETED
+  - Created `OrderItem` dataclass with full serialization support (to_dict/from_dict)
+  - Implemented `OrderStateManager` class with all command methods (add_item, remove_item, update_item_quantity, complete_order, clear_order)
+  - Implemented all query methods (get_items, get_item_by_id, get_total_count, get_order_summary, is_empty)
+  - Dual persistence: incremental log (JSONL) + final JSON on completion
+  - Returns immutable copies from query methods to prevent external state mutations
+  - 36 tests passing in 0.04s
+  - Files: `src/order_state_manager.py`
+  - Tests: `tests/test_order_state.py`
+  - Fixtures added to: `tests/conftest.py`
   - Depends on: Plan 01
 
-- [ ] **Plan 04: OrderTools**
-  - Not yet started
+- [x] **Plan 04: OrderTools** ✅ COMPLETED
+  - Created `src/tools/order_tools.py` with factory function and three tools
+  - Implemented `add_item_to_order` tool with validation integration
+  - Implemented `complete_order` tool for order finalization
+  - Implemented `remove_item_from_order` tool for item removal
+  - 24 tests passing in 0.45s
+  - Files: `src/tools/order_tools.py`, `src/tools/__init__.py`
+  - Tests: `tests/test_order_tools.py`
+  - Fixtures added to: `tests/conftest.py`
   - Depends on: Plans 01, 02, 03
 
 - [ ] **Plan 05: DriveThruLLM**

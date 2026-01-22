@@ -12,6 +12,66 @@ All app-level code is in the `src/` directory. In general, simple agents can be 
 
 Be sure to maintain code formatting. You can use the ruff formatter/linter as needed: `uv run ruff format` and `uv run ruff check`.
 
+## Data Models
+
+**IMPORTANT: Prefer Pydantic v2 models over dataclasses in greenfield implementations**
+
+When creating new data structures, use Pydantic v2 models instead of dataclasses. Pydantic provides:
+
+- **Runtime validation**: Automatic type checking and data validation at runtime
+- **JSON serialization**: Built-in `.model_dump()` and `.model_dump_json()` methods
+- **Schema generation**: Automatic JSON Schema generation for API documentation
+- **Environment variables**: Integration with `pydantic-settings` for configuration
+- **Better IDE support**: Enhanced autocomplete and type hints
+- **Extensibility**: Easy customization with validators, computed fields, and serializers
+
+### Example
+
+```python
+from pydantic import BaseModel, Field, field_validator
+from typing import Optional
+
+# ✓ Preferred: Pydantic v2 model
+class MenuItem(BaseModel):
+    name: str
+    price: float = Field(gt=0, description="Price must be positive")
+    category: str
+    available: bool = True
+
+    @field_validator('name')
+    @classmethod
+    def name_must_not_be_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError('Name cannot be empty')
+        return v
+
+# ✗ Avoid in greenfield code: dataclass
+from dataclasses import dataclass
+
+@dataclass
+class MenuItem:
+    name: str
+    price: float
+    category: str
+    available: bool = True
+```
+
+### When to use dataclasses
+
+Only use dataclasses when:
+- Working with existing code that already uses dataclasses
+- The data structure is purely internal and doesn't need validation or serialization
+- You need specific dataclass features incompatible with Pydantic
+
+### Migration from dataclasses
+
+When refactoring existing dataclasses to Pydantic models:
+1. Replace `@dataclass` with `class ModelName(BaseModel)`
+2. Add type hints for all fields
+3. Add validation rules using `Field()` and validators as needed
+4. Update serialization code to use `.model_dump()` and `.model_dump_json()`
+5. Update tests to verify validation behavior
+
 ## Package Management with `uv`
 
 **IMPORTANT:** This project uses `uv` as its package manager. You must **always** use `uv` commands instead of `pip` or bare `python` commands.
