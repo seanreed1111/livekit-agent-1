@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:automationpanda.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:peps.python.org)",
+      "WebFetch(domain:martinheinz.dev)",
+      "WebFetch(domain:winstonbrown.me)",
+      "WebFetch(domain:docs.github.com)",
+      "Bash(uv sync:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv pip:*)",
+      "Bash(uv run python:*)",
+      "Bash(uv run ruff format:*)",
+      "Bash(uv run ruff check:*)",
+      "WebSearch",
+      "Bash(ls:*)",
+      "Bash(PIPELINE__ADAPTER_TYPE=mock uv run python:*)",
+      "Bash(timeout 3 make:*)",
+      "Bash(make help:*)",
+      "Bash(make test:*)",
+      "Bash(timeout 10 make:*)",
+      "Bash(uv add:*)",
+      "WebFetch(domain:returns.readthedocs.io)",
+      "WebFetch(domain:common-changelog.org)",
+      "WebFetch(domain:broadinstitute.github.io)",
+      "Skill(commit-push-pr)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
