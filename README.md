@@ -2,233 +2,420 @@
   <img src="./.github/assets/livekit-mark.png" alt="LiveKit logo" width="100" height="100">
 </a>
 
-# LiveKit Agents Starter - Python
+# McDonald's Drive-Thru Voice AI Agent
 
-A complete starter project for building voice AI apps with [LiveKit Agents for Python](https://github.com/livekit/agents) and [LiveKit Cloud](https://cloud.livekit.io/).
+A voice AI agent system built with [LiveKit Agents for Python](https://github.com/livekit/agents) and [LiveKit Cloud](https://cloud.livekit.io/). This repository contains **two main applications**:
 
-The starter project includes:
+1. **McDonald's Drive-Thru Agent** (`src/agent.py`) - A specialized AI agent that takes drive-thru orders using McDonald's menu data
+2. **Generic Voice Assistant** (`src/app.py`) - A general-purpose voice AI assistant
 
-- A simple voice AI assistant, ready for extension and customization
-- A voice AI pipeline with [models](https://docs.livekit.io/agents/models) from OpenAI, Cartesia, and AssemblyAI served through LiveKit Cloud
-  - Easily integrate your preferred [LLM](https://docs.livekit.io/agents/models/llm/), [STT](https://docs.livekit.io/agents/models/stt/), and [TTS](https://docs.livekit.io/agents/models/tts/) instead, or swap to a realtime model like the [OpenAI Realtime API](https://docs.livekit.io/agents/models/realtime/openai)
-- Eval suite based on the LiveKit Agents [testing & evaluation framework](https://docs.livekit.io/agents/build/testing/)
-- [LiveKit Turn Detector](https://docs.livekit.io/agents/build/turns/turn-detector/) for contextually-aware speaker detection, with multilingual support
-- [Background voice cancellation](https://docs.livekit.io/home/cloud/noise-cancellation/)
-- Integrated [metrics and logging](https://docs.livekit.io/agents/build/metrics/)
-- A Dockerfile ready for [production deployment](https://docs.livekit.io/agents/ops/deployment/)
+## Table of Contents
 
-This starter app is compatible with any [custom web/mobile frontend](https://docs.livekit.io/agents/start/frontend/) or [SIP-based telephony](https://docs.livekit.io/agents/start/telephony/).
+- [Overview](#overview)
+- [Quick Start](#quick-start)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Setup](#environment-setup)
+  - [Download Model Files](#download-model-files)
+- [McDonald's Drive-Thru Agent](#mcdonalds-drive-thru-agent)
+  - [What It Does](#what-it-does)
+  - [How It Works](#how-it-works)
+  - [Running the Drive-Thru Agent](#running-the-drive-thru-agent)
+  - [Menu Data](#menu-data)
+  - [Order Output](#order-output)
+- [Generic Voice Assistant](#generic-voice-assistant)
+  - [What It Does](#what-it-does-1)
+  - [Running the Voice Assistant](#running-the-voice-assistant)
+- [Development](#development)
+  - [Project Structure](#project-structure)
+  - [Testing](#testing)
+  - [Code Formatting](#code-formatting)
+  - [Using the Makefile](#using-the-makefile)
+- [Architecture](#architecture)
+  - [Dependency Injection](#dependency-injection)
+  - [Pydantic Models](#pydantic-models)
+- [Frontend & Deployment](#frontend--deployment)
+  - [Frontend Options](#frontend-options)
+  - [Production Deployment](#production-deployment)
+- [Coding Agents and MCP](#coding-agents-and-mcp)
+- [License](#license)
 
-## Coding agents and MCP
+## Overview
 
-This project is designed to work with coding agents like [Cursor](https://www.cursor.com/) and [Claude Code](https://www.anthropic.com/claude-code). 
+This repository demonstrates how to build specialized voice AI agents using LiveKit. The codebase is organized around **two distinct entry points**:
 
-To get the most out of these tools, install the [LiveKit Docs MCP server](https://docs.livekit.io/mcp).
+- **`src/agent.py`** - McDonald's Drive-Thru Agent (specialized ordering system)
+- **`src/app.py`** - Generic Voice Assistant (general-purpose AI)
 
-For Cursor, use this link:
+Both applications share common infrastructure (STT, TTS, LLM) but serve different purposes.
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=livekit-docs&config=eyJ1cmwiOiJodHRwczovL2RvY3MubGl2ZWtpdC5pby9tY3AifQ%3D%3D)
+## Quick Start
 
-For Claude Code, run this command:
+### Prerequisites
 
-```
-claude mcp add --transport http livekit-docs https://docs.livekit.io/mcp
-```
+- Python 3.11 or later
+- [uv](https://docs.astral.sh/uv/) package manager
+- [LiveKit Cloud](https://cloud.livekit.io/) account (free tier available)
+- API keys for:
+  - OpenAI (for LLM)
+  - AssemblyAI (for STT)
+  - Cartesia (for TTS)
 
-For Codex CLI, use this command to install the server:
-```
-codex mcp add --url https://docs.livekit.io/mcp livekit-docs
-```
-
-For Gemini CLI, use this command to install the server:
-```
-gemini mcp add --transport http livekit-docs https://docs.livekit.io/mcp
-```
-
-The project includes a complete [AGENTS.md](AGENTS.md) file for these assistants. You can modify this file  your needs. To learn more about this file, see [https://agents.md](https://agents.md).
-
-## Dev Setup
+### Installation
 
 Clone the repository and install dependencies:
 
-```console
-cd agent-starter-python
+```bash
+git clone <repository-url>
+cd lk-agent-1
 uv sync
 ```
 
-**Important:** This project uses `uv` for dependency management. Always use `uv run` to execute commands (e.g., `uv run python src/agent.py`). Do not manually activate the virtual environment - `uv run` handles this automatically. If your IDE or shell auto-activates `.venv`, you can safely ignore it and continue using `uv run` for all commands.
+**IMPORTANT:** This project uses `uv` for dependency management. Always use `uv run` to execute commands (e.g., `uv run python src/agent.py`). Do not manually activate virtual environments - `uv run` handles this automatically.
 
-Sign up for [LiveKit Cloud](https://cloud.livekit.io/) then set up the environment by copying `.env.example` to `.env.local` and filling in the required keys:
+### Environment Setup
 
-- `LIVEKIT_URL`
-- `LIVEKIT_API_KEY`
-- `LIVEKIT_API_SECRET`
+1. Sign up for [LiveKit Cloud](https://cloud.livekit.io/)
 
-You can load the LiveKit environment automatically using the [LiveKit CLI](https://docs.livekit.io/home/cli/cli-setup):
+2. Copy the example environment file:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+3. Fill in the required keys in `.env.local`:
+   - `LIVEKIT_URL`
+   - `LIVEKIT_API_KEY`
+   - `LIVEKIT_API_SECRET`
+   - `OPENAI_API_KEY`
+   - `ASSEMBLYAI_API_KEY`
+   - `CARTESIA_API_KEY`
+
+You can also use the [LiveKit CLI](https://docs.livekit.io/home/cli/cli-setup) to automatically load environment variables:
 
 ```bash
 lk cloud auth
 lk app env -w -d .env.local
 ```
 
-## Run the agent
+### Download Model Files
 
-Before your first run, you must download certain models such as [Silero VAD](https://docs.livekit.io/agents/build/turns/vad/) and the [LiveKit turn detector](https://docs.livekit.io/agents/build/turns/turn-detector/):
+Before running either application for the first time, download required models:
 
-```console
+```bash
 uv run python src/agent.py download-files
 ```
 
-Next, run this command to speak to your agent directly in your terminal:
+This downloads:
+- Silero VAD (Voice Activity Detection) model
+- LiveKit multilingual turn detector model
 
-```console
+## McDonald's Drive-Thru Agent
+
+### What It Does
+
+The Drive-Thru Agent is a specialized voice AI that:
+
+- Takes customer orders for McDonald's menu items
+- Searches and validates items against a real McDonald's menu
+- Handles item modifiers (add-ons, substitutions)
+- Confirms each item as it's added
+- Reads back the complete order
+- Saves orders as JSON files for processing
+
+### How It Works
+
+The Drive-Thru Agent consists of several components:
+
+1. **DriveThruAgent** (`src/drive_thru_agent.py`)
+   - Orchestrates the ordering conversation
+   - Defines the agent's persona and instructions
+   - Manages order state via `OrderStateManager`
+   - Provides tools for adding/confirming orders
+
+2. **DriveThruLLM** (`src/drive_thru_llm.py`)
+   - Wraps the base LLM (e.g., GPT-4)
+   - Intercepts chat requests to inject menu context
+   - Searches menu based on keywords in user messages
+   - Reduces hallucination by grounding LLM in actual menu items
+
+3. **MenuProvider** (`src/menu_provider.py`)
+   - Loads McDonald's menu from JSON
+   - Provides search functionality
+   - Returns structured menu items (categories, modifiers)
+
+4. **OrderStateManager** (`src/order_state_manager.py`)
+   - Tracks order items during conversation
+   - Saves completed orders to JSON files
+   - One instance per session
+
+### Running the Drive-Thru Agent
+
+#### Console Mode (Testing)
+
+Test the agent directly in your terminal:
+
+```bash
 uv run python src/agent.py console
 ```
 
-To run the agent for use with a frontend or telephony, use the `dev` command:
+This mode is perfect for:
+- Quick testing and debugging
+- Trying out the ordering flow
+- Experimenting with menu items
 
-```console
+#### Dev Mode (LiveKit Connection)
+
+Run the agent with a LiveKit connection for testing with real voice:
+
+```bash
 uv run python src/agent.py dev
 ```
 
-In production, use the `start` command:
+This mode:
+- Connects to LiveKit Cloud
+- Supports frontend applications
+- Includes noise cancellation
+- Enables real voice interactions
 
-```console
+#### Production Mode
+
+For production deployment:
+
+```bash
 uv run python src/agent.py start
 ```
 
-## Makefile
+This is the production-ready entry point used in Docker deployments.
 
-This project includes a `Makefile` for convenient development workflows.
+### Menu Data
 
-### Quick Commands
+The McDonald's menu is stored as structured Pydantic models in `menus/mcdonalds/`:
+
+- **Menu Structure** - `transformed-data/menu-structure-2026-01-21.json`
+- **Pydantic Models** - `models.py`
+  - `Menu` - Complete menu with categories
+  - `Item` - Individual menu item with modifiers
+  - `Modifier` - Item variations (e.g., "Extra Cheese", "No Pickles")
+
+Categories include:
+- Breakfast
+- Beef & Pork
+- Chicken & Fish
+- Snacks & Sides
+- Beverages
+- Coffee & Tea
+- Desserts
+- Smoothies & Shakes
+
+### Order Output
+
+Completed orders are saved to the `orders/` directory as JSON files:
+
+```json
+{
+  "session_id": "abc123",
+  "items": [
+    {
+      "item_name": "Big Mac",
+      "category": "Beef & Pork",
+      "modifiers": ["Extra Cheese", "No Pickles"]
+    }
+  ],
+  "timestamp": "2026-01-22T10:30:00Z"
+}
+```
+
+## Generic Voice Assistant
+
+### What It Does
+
+The Generic Voice Assistant is a general-purpose AI that:
+
+- Answers questions on various topics
+- Provides helpful information
+- Maintains a friendly, conversational tone
+- Works with any topic (not menu-specific)
+
+### Running the Voice Assistant
 
 ```bash
-# See all available commands
-make help
-
-# Run the agent (requires API keys configured for the chosen models)
-make console        # Console mode
-make dev            # Dev mode
-make start          # Production mode
-
-# Development
-make test           # Run all tests
-make format         # Format code with ruff
-make lint           # Lint code with ruff
-
-# Utilities
-make download-files # Download required model files
-make clean          # Remove generated files
+uv run python src/app.py
 ```
 
-## Frontend & Telephony
+This runs a generic voice assistant without menu integration. Use this for:
+- General Q&A applications
+- Non-specialized voice interactions
+- Testing the base voice pipeline
 
-Get started quickly with our pre-built frontend starter apps, or add telephony support:
+## Development
 
-| Platform | Link | Description |
-|----------|----------|-------------|
-| **Web** | [`livekit-examples/agent-starter-react`](https://github.com/livekit-examples/agent-starter-react) | Web voice AI assistant with React & Next.js |
-| **iOS/macOS** | [`livekit-examples/agent-starter-swift`](https://github.com/livekit-examples/agent-starter-swift) | Native iOS, macOS, and visionOS voice AI assistant |
-| **Flutter** | [`livekit-examples/agent-starter-flutter`](https://github.com/livekit-examples/agent-starter-flutter) | Cross-platform voice AI assistant app |
-| **React Native** | [`livekit-examples/voice-assistant-react-native`](https://github.com/livekit-examples/voice-assistant-react-native) | Native mobile app with React Native & Expo |
-| **Android** | [`livekit-examples/agent-starter-android`](https://github.com/livekit-examples/agent-starter-android) | Native Android app with Kotlin & Jetpack Compose |
-| **Web Embed** | [`livekit-examples/agent-starter-embed`](https://github.com/livekit-examples/agent-starter-embed) | Voice AI widget for any website |
-| **Telephony** | [📚 Documentation](https://docs.livekit.io/agents/start/telephony/) | Add inbound or outbound calling to your agent |
+### Project Structure
 
-For advanced customization, see the [complete frontend guide](https://docs.livekit.io/agents/start/frontend/).
-
-## Tests and evals
-
-This project includes a complete suite of evals, based on the LiveKit Agents [testing & evaluation framework](https://docs.livekit.io/agents/build/testing/). To run them:
-
-```console
-make test
-# or
-uv run pytest
 ```
+src/
+├── agent.py                  # Drive-Thru Agent CLI (main entry point)
+├── app.py                    # Generic Voice Assistant
+├── config.py                 # Pydantic configuration models
+├── factories.py              # Creates STT/LLM/TTS instances
+├── session_handler.py        # Session orchestration
+├── drive_thru_agent.py       # Drive-Thru Agent implementation
+├── drive_thru_llm.py         # Menu-aware LLM wrapper
+├── menu_provider.py          # Menu search and loading
+├── order_state_manager.py   # Order tracking
+└── tools/
+    └── order_tools.py        # Order management tools
 
+menus/mcdonalds/
+├── models.py                 # Pydantic menu models
+├── transformed-data/         # Menu JSON files
+└── raw-data/                 # Original menu data
 
-
-## McDonald's Menu Models
-
-This project includes Pydantic v2 models for representing McDonald's menu data, designed to provide structured menu information to the LLM agent.
-
-### Models
-
-The menu system consists of three main models located in `menus/mcdonalds/models.py`:
-
-- **Modifier**: Represents a menu item variation/modifier
-  - `modifier_name: str` - Name of the modifier (e.g., "Egg Whites", "Cheese")
-  - `modifier_id: str` - Auto-generated UUID for each modifier
-
-- **Item**: Represents a menu item
-  - `category_name: str` - Category (e.g., "Breakfast", "Beef & Pork")
-  - `item_name: str` - Item name (e.g., "Big Mac")
-  - `available_as_base: bool` - Whether item can be ordered without modifications
-  - `modifiers: list[Modifier]` - Available variations for this item
-
-- **Menu**: Complete menu structure
-  - `categories: dict[str, list[Item]]` - All items organized by category
-  - Helper methods for accessing and manipulating menu items
-
-### Usage
-
-```python
-from menus.mcdonalds.models import Menu
-
-# Load the menu from the JSON file
-menu = Menu.load_from_file("menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json")
-
-# Access items by category
-breakfast_items = menu.get_category("Breakfast")
-
-# Get a specific item
-big_mac = menu.get_item("Beef & Pork", "Big Mac")
-
-# Add new items
-from menus.mcdonalds.models import Item
-new_item = Item(
-    category_name="Breakfast",
-    item_name="New Item",
-    available_as_base=True
-)
-new_item.add_modifier("Extra Cheese")
-menu.add_item(new_item)
-
-# Save modified menu
-menu.save_to_file("updated_menu.json")
-```
-
-### Serialization
-
-All models support JSON serialization and deserialization:
-
-```python
-# Serialize individual items or modifiers
-json_str = item.to_json()
-item = Item.from_json(json_str)
-
-# Serialize entire menu
-json_str = menu.to_json()
-menu = Menu.from_json(json_str)
-
-# Save/Load from files
-menu.save_to_file("output.json")
-menu = Menu.load_from_file("menu-structure-2026-01-21.json")
+tests/
+├── conftest.py              # Shared pytest fixtures
+├── test_drive_thru_agent.py # Agent tests
+├── test_menu_models.py      # Menu model tests
+└── ...
 ```
 
 ### Testing
 
-Run the menu model tests:
+Run all tests:
 
-```console
-uv run python -m pytest tests/test_menu_models.py -v
+```bash
+uv run pytest
 ```
 
-## Deploying to production
+Run specific test file:
 
-This project is production-ready and includes a working `Dockerfile`. To deploy it to LiveKit Cloud or another environment, see the [deploying to production](https://docs.livekit.io/agents/ops/deployment/) guide.
+```bash
+uv run pytest tests/test_drive_thru_agent.py -v
+```
+
+Run with coverage:
+
+```bash
+uv run pytest --cov=src --cov-report=html
+```
+
+### Code Formatting
+
+Format code with ruff:
+
+```bash
+uv run ruff format
+```
+
+Lint code:
+
+```bash
+uv run ruff check
+```
+
+Fix linting issues:
+
+```bash
+uv run ruff check --fix
+```
+
+### Using the Makefile
+
+This project includes a Makefile for common tasks:
+
+```bash
+make help           # Show all available commands
+make console        # Run drive-thru agent in console mode
+make dev            # Run drive-thru agent in dev mode
+make test           # Run all tests
+make format         # Format code
+make lint           # Lint code
+make download-files # Download model files
+```
+
+## Architecture
+
+### Dependency Injection
+
+This codebase uses dependency injection (DI) to construct components:
+
+1. **Configuration** - `src/config.py` (Pydantic v2 models, env-driven)
+2. **Construction** - `src/factories.py` (builds STT/LLM/TTS)
+3. **Wiring** - `src/agent.py` or `src/app.py` (creates app + server)
+4. **Runtime** - `src/session_handler.py` (manages sessions)
+
+No custom adapters or protocols are used - components are constructed directly using LiveKit's concrete types.
+
+### Pydantic Models
+
+This project uses **Pydantic v2** for all data models:
+
+- Runtime validation
+- JSON serialization/deserialization
+- Schema generation
+- Environment variable integration
+- Better IDE support
+
+See `AGENTS.md` for detailed guidelines on when to use Pydantic vs dataclasses.
+
+## Frontend & Deployment
+
+### Frontend Options
+
+Get started with pre-built frontend applications:
+
+| Platform | Repository | Description |
+|----------|-----------|-------------|
+| **Web** | [`agent-starter-react`](https://github.com/livekit-examples/agent-starter-react) | React & Next.js web app |
+| **iOS/macOS** | [`agent-starter-swift`](https://github.com/livekit-examples/agent-starter-swift) | Native iOS, macOS, visionOS |
+| **Flutter** | [`agent-starter-flutter`](https://github.com/livekit-examples/agent-starter-flutter) | Cross-platform mobile |
+| **React Native** | [`voice-assistant-react-native`](https://github.com/livekit-examples/voice-assistant-react-native) | React Native & Expo |
+| **Android** | [`agent-starter-android`](https://github.com/livekit-examples/agent-starter-android) | Native Android (Kotlin) |
+| **Web Embed** | [`agent-starter-embed`](https://github.com/livekit-examples/agent-starter-embed) | Embeddable widget |
+| **Telephony** | [Documentation](https://docs.livekit.io/agents/start/telephony/) | Phone integration |
+
+See the [complete frontend guide](https://docs.livekit.io/agents/start/frontend/) for advanced customization.
+
+### Production Deployment
+
+This project includes a production-ready `Dockerfile`. To deploy:
+
+1. Build the Docker image:
+   ```bash
+   docker build -t drive-thru-agent .
+   ```
+
+2. Deploy to LiveKit Cloud or your preferred platform
+
+See the [deploying to production guide](https://docs.livekit.io/agents/ops/deployment/) for details.
+
+## Coding Agents and MCP
+
+This project works with coding agents like [Cursor](https://www.cursor.com/) and [Claude Code](https://www.anthropic.com/claude-code).
+
+Install the [LiveKit Docs MCP server](https://docs.livekit.io/mcp) for best results:
+
+**For Cursor:**
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=livekit-docs&config=eyJ1cmwiOiJodHRwczovL2RvY3MubGl2ZWtpdC5pby9tY3AifQ%3D%3D)
+
+**For Claude Code:**
+
+```bash
+claude mcp add --transport http livekit-docs https://docs.livekit.io/mcp
+```
+
+**For Codex CLI:**
+
+```bash
+codex mcp add --url https://docs.livekit.io/mcp livekit-docs
+```
+
+**For Gemini CLI:**
+
+```bash
+gemini mcp add --transport http livekit-docs https://docs.livekit.io/mcp
+```
+
+The project includes a complete [AGENTS.md](AGENTS.md) file with coding guidelines. See [https://agents.md](https://agents.md) to learn more.
 
 
 

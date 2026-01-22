@@ -26,7 +26,10 @@
       "WebFetch(domain:broadinstitute.github.io)",
       "Skill(commit-push-pr)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Skill(makefile)",
+      "Bash(git checkout:*)",
+      "Bash(git rm:*)"
     ]
   }
 }
