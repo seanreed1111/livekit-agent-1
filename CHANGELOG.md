@@ -1,5 +1,105 @@
 # Changelog
 
+## Combined changelog for commits db75b2e to 45bdc8e (January 21, 2026)
+
+### Features
+
+#### McDonald's Menu System
+- **Menu data foundation** - Added comprehensive McDonald's menu data infrastructure
+  - Sourced from Kaggle dataset with 261 menu items
+  - Organized into categories: Breakfast, Beef & Pork, Chicken & Fish, Beverages, Coffee & Tea, Smoothies & Shakes, Desserts, Salads, Snacks & Sides
+- **JSON menu structure** - Structured menu data with multiple format explorations
+  - Primary structure: `menu-structure-2026-01-21.json` (949 lines)
+  - JSON Schema validation: `menu-structure-2026-01-21.schema.json`
+  - Alternative formats explored for optimal design
+- **Menu parsing utilities** - `parse_menu.py` script for transforming CSV to structured JSON (167 lines)
+- **Menu validation** - `validate_menu.py` script for verifying menu structure integrity (72 lines)
+
+#### Visual Documentation
+- **Mermaid diagrams** - Complete visual representation of menu structure
+  - Beef & Pork category diagram (36 lines)
+  - Beverages diagram (56 lines)
+  - Breakfast diagram (72 lines)
+  - Chicken & Fish diagram (56 lines)
+  - Coffee & Tea diagram (198 lines)
+  - Desserts diagram (16 lines)
+  - Salads diagram (14 lines)
+  - Smoothies & Shakes diagram (64 lines)
+  - Snacks & Sides diagram (28 lines)
+- **Menu structure documentation** - `menu-structure.md` comprehensive guide (1,136 lines)
+
+#### Menu Structure Design
+- **Multiple alternatives evaluated**:
+  - Base-first structure (`menu-structure-v2-base-first.json`)
+  - Explicit standard structure (`menu-structure-v2-explicit-standard.json`)
+  - Flattened structure (`menu-structure-v2-flattened.json`)
+  - Modifiers-focused structure (`menu-structure-v2-modifiers.json`)
+  - Separated structure (`menu-structure-v2-separated.json`)
+  - Null-value handling (`menu-structure-with-null.json`)
+- **Design comparison document** - `menu-structure-alternatives-comparison.md` (238 lines)
+
+### Documentation
+- **AGENTS.md updates** - Added 64 lines documenting McDonald's menu models
+  - Pydantic v2 model specifications
+  - Usage examples for Menu, Item, and Modifier models
+  - Serialization and file I/O patterns
+  - Testing guidelines for menu models
+
+### Data Organization
+- **Raw data directory** - Organized source CSV files in `menus/mcdonalds/raw-data/`
+  - `mcdonalds-menu-from-kaggle.csv` - Original Kaggle dataset
+  - `mcdonalds-menu-items.csv` - Processed menu items
+- **Transformed data directory** - Structured JSON outputs in `menus/mcdonalds/transformed-data/`
+  - Final menu structure with schema
+  - Alternative structure formats for comparison
+- **Alternative options directory** - Design explorations in `alt-menu-options/`
+
+### Dependencies
+- **Added jsonschema** - For menu structure validation
+
+### Files Added
+
+#### Menu Data (2,800+ lines)
+- `menus/mcdonalds/raw-data/mcdonalds-menu-from-kaggle.csv` (261 lines)
+- `menus/mcdonalds/raw-data/mcdonalds-menu-items.csv` (261 lines)
+- `menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json` (949 lines)
+- `menus/mcdonalds/transformed-data/menu-structure-2026-01-21.schema.json` (65 lines)
+
+#### Scripts & Utilities (239 lines)
+- `parse_menu.py` - Menu transformation script (167 lines)
+- `menus/mcdonalds/transformed-data/validate_menu.py` - Validation script (72 lines)
+
+#### Documentation (1,374 lines)
+- `menus/mcdonalds/menu-structure.md` - Comprehensive guide (1,136 lines)
+- `menus/mcdonalds/transformed-data/menu-structure-alternatives-comparison.md` (238 lines)
+
+#### Mermaid Diagrams (540 lines)
+- 9 category-specific diagram files totaling 540 lines
+
+#### Alternative Structures (638 lines)
+- 6 alternative JSON structure formats for design evaluation
+
+### Files Modified
+- `AGENTS.md` - Added McDonald's menu models documentation (+64 lines)
+- `pyproject.toml` - Added jsonschema dependency
+- `uv.lock` - Updated with new dependencies (+79 lines)
+
+### Files Removed
+- `menus/mcdonalds/transformed-data/menu-structure.json` - Replaced with versioned structure
+
+### Migration Notes
+
+This version establishes the data foundation for a voice-ordering system:
+- **Comprehensive menu data**: Complete McDonald's menu with categories and items
+- **Validated structure**: JSON Schema ensures data integrity
+- **Multiple format options**: Evaluated alternatives to find optimal structure
+- **Visual documentation**: Mermaid diagrams provide clear menu hierarchy
+- **Parsing infrastructure**: Scripts for future menu updates and transformations
+
+The menu system is designed to integrate with Pydantic v2 models for LLM-friendly structured data access.
+
+---
+
 ## Combined changelog for commits c6ae5c1 to db75b2e (January 21, 2026)
 
 ### Features
