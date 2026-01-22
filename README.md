@@ -11,34 +11,39 @@ A voice AI agent system built with [LiveKit Agents for Python](https://github.co
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Quick Start](#quick-start)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Environment Setup](#environment-setup)
-  - [Download Model Files](#download-model-files)
-- [McDonald's Drive-Thru Agent](#mcdonalds-drive-thru-agent)
-  - [What It Does](#what-it-does)
-  - [How It Works](#how-it-works)
-  - [Running the Drive-Thru Agent](#running-the-drive-thru-agent)
-  - [Menu Data](#menu-data)
-  - [Order Output](#order-output)
-- [Generic Voice Assistant](#generic-voice-assistant)
-  - [What It Does](#what-it-does-1)
-  - [Running the Voice Assistant](#running-the-voice-assistant)
-- [Development](#development)
-  - [Project Structure](#project-structure)
-  - [Testing](#testing)
-  - [Code Formatting](#code-formatting)
-  - [Using the Makefile](#using-the-makefile)
-- [Architecture](#architecture)
-  - [Dependency Injection](#dependency-injection)
-  - [Pydantic Models](#pydantic-models)
-- [Frontend & Deployment](#frontend--deployment)
-  - [Frontend Options](#frontend-options)
-  - [Production Deployment](#production-deployment)
-- [Coding Agents and MCP](#coding-agents-and-mcp)
-- [License](#license)
+- [McDonald's Drive-Thru Voice AI Agent](#mcdonalds-drive-thru-voice-ai-agent)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Quick Start](#quick-start)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Environment Setup](#environment-setup)
+    - [Download Model Files](#download-model-files)
+  - [McDonald's Drive-Thru Agent](#mcdonalds-drive-thru-agent)
+    - [What It Does](#what-it-does)
+    - [How It Works](#how-it-works)
+    - [Running the Drive-Thru Agent](#running-the-drive-thru-agent)
+      - [Console Mode (Testing)](#console-mode-testing)
+      - [Dev Mode (LiveKit Connection)](#dev-mode-livekit-connection)
+      - [Production Mode](#production-mode)
+    - [Menu Data](#menu-data)
+    - [Order Output](#order-output)
+  - [Generic Voice Assistant](#generic-voice-assistant)
+    - [What It Does](#what-it-does-1)
+    - [Running the Voice Assistant](#running-the-voice-assistant)
+  - [Development](#development)
+    - [Project Structure](#project-structure)
+    - [Testing](#testing)
+    - [Code Formatting](#code-formatting)
+    - [Using the Makefile](#using-the-makefile)
+  - [Architecture](#architecture)
+    - [Dependency Injection](#dependency-injection)
+    - [Pydantic Models](#pydantic-models)
+  - [Frontend \& Deployment](#frontend--deployment)
+    - [Frontend Options](#frontend-options)
+    - [Production Deployment](#production-deployment)
+  - [Coding Agents and MCP](#coding-agents-and-mcp)
+  - [License](#license)
 
 ## Overview
 
@@ -380,8 +385,9 @@ This project includes a production-ready `Dockerfile`. To deploy:
 
 1. Build the Docker image:
    ```bash
-   docker build -t drive-thru-agent .
+   docker build --platform linux/amd64 --no-cache -t drive-thru-agent .
    ```
+
 
 2. Deploy to LiveKit Cloud or your preferred platform
 

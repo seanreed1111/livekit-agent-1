@@ -4,12 +4,14 @@ This module contains the main application class and agent implementation,
 refactored to use dependency injection for STT, LLM, and TTS components.
 """
 
+import sys
+
 from dotenv import load_dotenv
 from livekit.agents import Agent, AgentServer, JobContext, JobProcess, cli
 from livekit.plugins import silero
 from loguru import logger
 
-from config import AppConfig, PipelineConfig
+from config import AppConfig
 from factories import create_llm, create_stt, create_tts
 from session_handler import SessionHandler
 
@@ -84,13 +86,24 @@ def create_app(config: AppConfig | None = None) -> AgentServer:
     return server
 
 
-if __name__ == "__main__":
-    config = AppConfig(
-        pipeline=PipelineConfig(
-            llm_model="mock",
-            enable_keyword_intercept=True,
-        )
+def download_files():
+    """Download required model files (VAD, turn detector, etc.)."""
+    print("Downloading Silero VAD model...")
+    silero.VAD.load()
+    print("✓ Silero VAD model downloaded")
+    print(
+        "\nNote: Multilingual turn detector will be downloaded automatically on first use "
+        "(requires job context)"
     )
-    server = create_app(config=config)
-    logger.info("Starting voice agent application")
-    cli.run_app(server)
+    print("\nAll models downloaded successfully!")
+
+
+if __name__ == "__main__":
+    # Simple CLI: check for download-files command
+    if len(sys.argv) > 1 and sys.argv[1] == "download-files":
+        download_files()
+    else:
+        # Default: start the voice assistant
+        server = create_app()
+        logger.info("Starting voice assistant application")
+        cli.run_app(server)

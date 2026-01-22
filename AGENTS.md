@@ -4,6 +4,33 @@ This is a LiveKit Agents project. LiveKit Agents is a Python SDK for building vo
 
 The following is a guide for working with this project.
 
+## Interaction Guidelines
+
+**IMPORTANT: Distinguish between questions and action requests**
+
+When the user asks a question about how to do something or what would be needed, they are seeking **information only** - do not take action unless explicitly requested.
+
+### Questions (provide information only):
+- "How do I..."
+- "What would I need to do to..."
+- "What are the steps for..."
+- "Can you explain how to..."
+- "What's the best way to..."
+
+**Response**: Explain the approach, provide options, show examples, but do NOT make changes to files or execute commands.
+
+### Action requests (take action):
+- "Please update..."
+- "Can you change..."
+- "Fix the..."
+- "Add this feature..."
+- "Update AGENTS.md to..."
+
+**Response**: Make the requested changes, execute commands, modify files as needed.
+
+### When uncertain:
+If it's unclear whether the user wants information or action, ask for clarification using the AskUserQuestion tool.
+
 ## Project structure
 
 This Python project uses the `uv` package manager. You should **always** use `uv` for all Python operations - installing dependencies, running scripts, running tests, and executing any Python commands.
