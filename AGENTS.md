@@ -121,7 +121,30 @@ If you use the LiveKit Docs MCP Server to search or browse documentation, also s
 - When asked to write BDD scenarios or feature files, they should be written in Gherkin language
 - Only implement steps corresponding to the scenarios when explicitly told to do so
 - When writing authorization/authentication scenarios, write only a minimal set of five or less unless explicitly told otherwise
-  
+
+
+## Planning Principles
+
+When reviewing or creating implementation plans, adhere to the following principles:
+
+### Consistency and Separation of Concerns
+
+- **Review all plans for consistency**: Ensure naming conventions, patterns, and approaches are uniform throughout the codebase
+- **Sharp boundaries**: Maintain clear, well-defined boundaries between components and modules
+- **Separation of concerns**: Each module, class, or function should have a single, well-defined responsibility
+- **Kent Beck and Dave Farley approach**: Apply rigorous software engineering discipline to planning:
+  - Make the change easy, then make the easy change
+  - Prefer small, incremental steps over large changes
+  - Keep designs simple and avoid unnecessary abstraction
+  - Ensure every component has a clear purpose and minimal dependencies
+  - Focus on continuous improvement and refactoring as you go
+  - Design for testability from the start
+
+When creating plans, explicitly identify:
+- Component boundaries and their responsibilities
+- Dependencies between components
+- Potential coupling that should be avoided
+- Opportunities to simplify the design
 
 ## Architecture Patterns
 
