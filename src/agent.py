@@ -197,15 +197,15 @@ def download_files():
     Run this before your first session to download necessary models.
     """
     from livekit.plugins import silero
-    from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
     click.echo("Downloading Silero VAD model...")
     silero.VAD.load()
     click.echo("✓ Silero VAD model downloaded")
 
-    click.echo("Downloading multilingual turn detector...")
-    MultilingualModel.load()
-    click.echo("✓ Multilingual turn detector downloaded")
+    click.echo(
+        "\nNote: Multilingual turn detector will be downloaded automatically on first use "
+        "(requires job context)"
+    )
 
     click.echo("\nAll models downloaded successfully!")
 
