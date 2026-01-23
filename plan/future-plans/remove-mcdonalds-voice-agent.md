@@ -485,14 +485,14 @@ docker build --platform linux/amd64 -t generic-voice-assistant .
 
 ## Phase 9: Git Commit
 
-### Review Changes
+- [x] Review Changes
 ```bash
 git status
 git diff --stat
 git diff --name-status | head -20
 ```
 
-### Create Commit
+- [x] Create Commit
 ```bash
 git add -A
 git commit -m "feat: remove drive-thru code, simplify to generic voice assistant
@@ -515,7 +515,7 @@ The generic voice assistant (src/app.py) remains fully functional with all
 shared infrastructure (factories, config, session handler)."
 ```
 
-### Final Verification
+- [x] Final Verification
 ```bash
 git status
 uv run pytest tests/ -v
