@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agent-starter-python"
-version = "1.0.0"
-description = "Simple voice AI assistant built with LiveKit Agents for Python"
+name = "generic-voice-assistant"
+version = "2.0.0"
+description = "Generic voice AI assistant built with LiveKit Agents for Python"
 requires-python = ">=3.11, <3.14"
 
 dependencies = [
@@ -15,8 +15,6 @@ dependencies = [
     "loguru",
     "pydantic>=2.0,<3.0",
     "pydantic-settings>=2.0,<3.0",
-    "rapidfuzz>=3.14.3",
-    "click>=8.3.1",
 ]
 
 [dependency-groups]
