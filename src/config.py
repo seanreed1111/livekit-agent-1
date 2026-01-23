@@ -80,48 +80,6 @@ class SessionConfig(BaseModel):
     )
 
 
-class DriveThruConfig(BaseModel):
-    """Configuration for McDonald's drive-thru agent."""
-
-    # Menu configuration
-    menu_file_path: str = Field(
-        default="src/menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json",
-        description="Path to menu JSON file",
-    )
-
-    # Order output
-    orders_output_dir: str = Field(
-        default="orders",
-        description="Directory to save order files",
-    )
-
-    # Accuracy strategies
-    fuzzy_match_threshold: int = Field(
-        default=85,
-        description="Minimum fuzzy match score (0-100) for item names",
-        ge=0,
-        le=100,
-    )
-
-    max_context_items: int = Field(
-        default=50,
-        description="Maximum number of menu items to inject into LLM context",
-        ge=10,
-        le=100,
-    )
-
-    # Feature flags
-    enable_confirmation_loop: bool = Field(
-        default=True,
-        description="Require confirmation before adding items",
-    )
-
-    enable_semantic_search: bool = Field(
-        default=False,
-        description="Use embeddings for semantic item search (future)",
-    )
-
-
 class AppConfig(BaseSettings):
     """Top-level application configuration.
 
@@ -138,10 +96,6 @@ class AppConfig(BaseSettings):
     agent: AgentConfig = Field(default_factory=AgentConfig)
     pipeline: PipelineConfig = Field(default_factory=PipelineConfig)
     session: SessionConfig = Field(default_factory=SessionConfig)
-    drive_thru: DriveThruConfig = Field(
-        default_factory=DriveThruConfig,
-        description="Drive-thru agent configuration",
-    )
 
     # LiveKit connection settings (from environment)
     livekit_url: str | None = Field(default=None, alias="LIVEKIT_URL")

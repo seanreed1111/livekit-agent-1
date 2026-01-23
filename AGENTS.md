@@ -35,7 +35,7 @@ If it's unclear whether the user wants information or action, ask for clarificat
 
 This Python project uses the `uv` package manager. You should **always** use `uv` for all Python operations - installing dependencies, running scripts, running tests, and executing any Python commands.
 
-All app-level code is in the `src/` directory. In general, simple agents can be constructed with a single `agent.py` file. Additional files can be added, but you must retain `agent.py` as the entrypoint (see the associated Dockerfile for how this is deployed).
+All app-level code is in the `src/` directory. In general, simple agents can be constructed with a single `app.py` file. Additional files can be added as needed for more complex implementations.
 
 Be sure to maintain code formatting. You can use the ruff formatter/linter as needed: `uv run ruff format` and `uv run ruff check`.
 
@@ -150,7 +150,7 @@ uv run ruff check
 uv run ruff format
 
 # Run the agent
-uv run python src/agent.py dev
+uv run python src/app.py
 ```
 
 ### Syncing Dependencies
@@ -340,14 +340,14 @@ The responsibilities are:
 
 1. **Configuration**: `src/config.py` (Pydantic v2 models, env-driven)
 2. **Construction**: `src/factories.py` (builds `livekit.agents.inference.STT/LLM/TTS`)
-3. **Wiring**: `src/agent.py` (creates the app + server)
+3. **Wiring**: `src/app.py` (creates the app + server)
 4. **Runtime behavior**: `src/session_handler.py` (creates `AgentSession` and runs it)
 
 #### Current file structure
 
 ```
 src/
-├── agent.py            # App entrypoint + wiring
+├── app.py              # App entrypoint + wiring
 ├── config.py           # Pydantic configuration models
 ├── factories.py        # Creates inference STT/LLM/TTS from config
 ├── session_handler.py  # Session orchestration (AgentSession)

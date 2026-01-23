@@ -84,7 +84,11 @@ class KeywordInterceptLLM(LLM):
             The content of the most recent user message, or empty string if none found
         """
         for item in reversed(chat_ctx.items):
-            if hasattr(item, "role") and item.role == "user" and hasattr(item, "content"):
+            if (
+                hasattr(item, "role")
+                and item.role == "user"
+                and hasattr(item, "content")
+            ):
                 # Extract text content from the item
                 # Content might be a list of content parts or a string
                 content = item.content

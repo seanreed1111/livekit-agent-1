@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.0.0] - 2026-01-23
+
+### BREAKING CHANGES
+- Removed all McDonald's drive-thru specific code
+- Simplified to generic voice assistant only
+- Main entry point is now `src/app.py` (replaced `src/agent.py` CLI)
+
+### Removed
+- Drive-thru agent implementation
+- Menu provider, validation, and order management
+- Drive-thru specific tests and BDD scenarios
+- `DriveThruConfig` and `DriveThruSessionHandler`
+- CLI commands (console/dev/start modes)
+
+### Changed
+- Dockerfile entrypoint updated to use `src/app.py`
+- Makefile simplified for generic assistant
+- Documentation updated to reflect generic use case only
+
+---
+
 ## PR #11: Plan Review System and Planning Command Updates (January 23, 2026)
 
 **Commit:** 8c86909

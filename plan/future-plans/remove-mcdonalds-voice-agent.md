@@ -26,13 +26,13 @@ This plan has been updated based on review feedback to address all high-priority
 
 ## Phase 1: Preparation & Safety
 
-### Create Safety Branch
+- [x] Create Safety Branch
 ```bash
 git checkout -b remove-drive-thru-code
 git status
 ```
 
-### Verify Current State
+- [x] Verify Current State
 ```bash
 # Verify branch was created successfully
 git branch --show-current
@@ -46,7 +46,7 @@ git branch --show-current
 
 ## Phase 2: Delete Drive-Thru Source Files
 
-### Core Drive-Thru Files (delete entirely)
+- [x] Core Drive-Thru Files (delete entirely)
 ```bash
 rm src/drive_thru_agent.py
 rm src/drive_thru_llm.py
@@ -59,12 +59,12 @@ rm src/agent.py
 
 **Critical:** `src/agent.py` is the old drive-thru entry point. `src/app.py` becomes the new main entry point.
 
-### Menu Data (delete entire directory)
+- [x] Menu Data (delete entire directory)
 ```bash
 rm -rf src/menus/
 ```
 
-### Tools Directory (delete entirely)
+- [x] Tools Directory (delete entirely)
 ```bash
 # Delete entire tools directory
 rm -rf src/tools/
@@ -76,7 +76,7 @@ rm -rf src/tools/
 
 ## Phase 3: Delete Drive-Thru Tests
 
-### Test Files (delete entirely)
+- [x] Test Files (delete entirely)
 ```bash
 rm tests/test_drive_thru_agent.py
 rm tests/test_drive_thru_llm.py
@@ -88,7 +88,7 @@ rm tests/test_order_state.py
 rm tests/test_order_tools.py
 ```
 
-### BDD Feature Files (delete directory)
+- [x] BDD Feature Files (delete directory)
 ```bash
 rm -rf tests/features/
 ```
@@ -97,7 +97,7 @@ rm -rf tests/features/
 
 ## Phase 4: Update Shared Source Files
 
-### 4.1: Update `src/config.py`
+- [x] 4.1: Update `src/config.py`
 
 **DELETE lines 83-123:**
 ```python
@@ -116,7 +116,7 @@ class DriveThruConfig(BaseModel):
 
 **KEEP:** All other configs (`AgentConfig`, `PipelineConfig`, `SessionConfig`, `AppConfig`)
 
-### 4.2: Update `src/session_handler.py`
+- [x] 4.2: Update `src/session_handler.py`
 
 **DELETE lines 107-159:**
 ```python
@@ -127,7 +127,7 @@ class DriveThruSessionHandler:
 
 **KEEP:** `SessionHandler` class (lines 15-105) - this is generic and used by `app.py`
 
-### 4.3: Update `tests/conftest.py`
+- [x] 4.3: Update `tests/conftest.py`
 
 **DELETE imports (lines 12-13):**
 ```python
@@ -180,7 +180,7 @@ from menu_provider import MenuProvider
 
 ## Phase 5: Update Build & Deployment
 
-### 5.1: Update `Dockerfile`
+- [x] 5.1: Update `Dockerfile`
 
 **Line 64 - Change download command:**
 ```dockerfile
@@ -200,7 +200,7 @@ CMD ["uv", "run", "src/agent.py", "start"]
 CMD ["uv", "run", "python", "src/app.py"]
 ```
 
-### 5.2: Replace `Makefile`
+- [x] 5.2: Replace `Makefile`
 
 **Complete rewrite** for generic assistant:
 
@@ -261,7 +261,7 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 ```
 
-### 5.3: Update `pyproject.toml` metadata
+- [x] 5.3: Update `pyproject.toml` metadata
 
 **Lines 6-8:**
 ```toml
@@ -276,7 +276,7 @@ version = "2.0.0"
 description = "Generic voice AI assistant built with LiveKit Agents for Python"
 ```
 
-### 5.4: Remove drive-thru dependencies from `pyproject.toml`
+- [x] 5.4: Remove drive-thru dependencies from `pyproject.toml`
 
 **DELETE lines 18-19 (drive-thru only dependencies):**
 ```toml
@@ -305,7 +305,7 @@ uv tree
 
 ## Phase 6: Update Documentation
 
-### 6.1: Update `README.md`
+- [x] 6.1: Update `README.md`
 
 **Major sections to rewrite:**
 
@@ -334,7 +334,7 @@ uv tree
    - Architecture section (DI, Pydantic)
    - Frontend & Deployment section
 
-### 6.2: Update `AGENTS.md`
+- [x] 6.2: Update `AGENTS.md`
 
 **Line 38 - Update project structure description:**
 ```markdown
@@ -384,7 +384,7 @@ grep -n "drive-thru\|drive_thru\|McDonald\|menu\|order" AGENTS.md
 
 **Keep:** All generic best practices sections (Pydantic, testing, DI patterns, planning principles)
 
-### 6.3: Update `CHANGELOG.md`
+- [x] 6.3: Update `CHANGELOG.md`
 
 **Add new entry at top:**
 ```markdown
@@ -412,14 +412,14 @@ grep -n "drive-thru\|drive_thru\|McDonald\|menu\|order" AGENTS.md
 
 ## Phase 7: Clean Up Runtime Files
 
-### Update `.gitignore`
+- [x] Update `.gitignore`
 ```bash
 # Add to .gitignore if not already present
 echo "orders/" >> .gitignore
 echo "plan/" >> .gitignore
 ```
 
-### Delete Runtime Directories (local only)
+- [x] Delete Runtime Directories (local only)
 ```bash
 rm -rf orders/
 rm -rf plan/completed-plans/drive-thru-llm/
@@ -431,7 +431,7 @@ rm -rf plan/completed-plans/drive-thru-llm/
 
 ## Phase 8: Verification
 
-### 8.1: Code Quality Checks
+- [x] 8.1: Code Quality Checks
 ```bash
 # Format and lint
 uv run ruff format
@@ -446,7 +446,7 @@ grep -r "menu_provider" src/ tests/ 2>/dev/null || echo "✓ No menu_provider re
 
 **Success:** No linting errors, code formatted, no drive-thru references.
 
-### 8.2: Test Suite Verification
+- [x] 8.2: Test Suite Verification
 ```bash
 # Run all remaining tests
 uv run pytest tests/ -v
@@ -454,7 +454,7 @@ uv run pytest tests/ -v
 
 **Success:** All tests pass, no import errors.
 
-### 8.3: Application Smoke Test
+- [x] 8.3: Application Smoke Test
 ```bash
 # Download models
 uv run python src/app.py download-files
@@ -471,7 +471,7 @@ uv run pytest tests/test_agent.py -v
 - App module imports without errors
 - All tests pass (verifies app initialization works)
 
-### 8.4: Docker Build Verification
+- [x] 8.4: Docker Build Verification
 ```bash
 # Build Docker image
 docker build --platform linux/amd64 -t generic-voice-assistant .
