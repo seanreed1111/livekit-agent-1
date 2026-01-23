@@ -275,6 +275,40 @@ When creating plans, explicitly identify:
 - Potential coupling that should be avoided
 - Opportunities to simplify the design
 
+## Plan Review
+
+Before executing implementation plans, use the `/review_plan` command to assess quality and executability:
+
+```bash
+/review_plan plan/YYYY-MM-DD-feature-name.md
+```
+
+The review process:
+1. Analyzes plans for accuracy, consistency, clarity, completeness, executability
+2. Provides executability score (0-100%)
+3. Identifies critical blockers, major concerns, minor issues
+4. Generates actionable recommendations with priorities
+5. Saves review to `*.REVIEW.md` file
+
+**Important:** Reviews are non-destructive. No changes are made to original plans without explicit approval.
+
+### When to Review
+
+- After creating a complex plan with `/create_plan`
+- Before starting plan execution with `/implement_plan`
+- When a plan seems ambiguous or incomplete
+- Before assigning work to multiple agents
+- Periodically for long-running plans
+
+### Review Criteria
+
+Plans should score 75+ for safe execution:
+- **90-100**: Excellent - Ready for execution
+- **75-89**: Good - Minor clarifications needed
+- **60-74**: Fair - Improvements recommended
+- **40-59**: Poor - Major revisions required
+- **0-39**: Critical - Cannot execute safely
+
 ## Implementation Tracking
 
 **IMPORTANT: Always check and update implementation checklists**

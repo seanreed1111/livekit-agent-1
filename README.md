@@ -336,6 +336,32 @@ make lint           # Lint code
 make download-files # Download model files
 ```
 
+### Plan Review Command
+
+Review implementation plans for quality and executability before execution:
+
+```bash
+# Review a plan file
+/review_plan plan/2026-01-23-feature-name.md
+
+# Review a multi-file plan
+/review_plan plan/2026-01-23-feature-name/
+
+# Interactive mode
+/review_plan
+```
+
+The review agent analyzes plans across 5 dimensions:
+1. **Accuracy** - Technical correctness and validity
+2. **Consistency** - Internal consistency and conventions
+3. **Clarity** - Clear, unambiguous instructions
+4. **Completeness** - All necessary steps and context
+5. **Executability** - Can agents execute without intervention?
+
+Output: Review saved to `*.REVIEW.md` with executability score (0-100) and detailed recommendations.
+
+**Note:** Reviews are advisory only. No changes are made to original plans.
+
 ## Architecture
 
 ### Dependency Injection

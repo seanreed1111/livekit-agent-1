@@ -225,14 +225,14 @@ This ensures agents have the necessary context loaded before making changes.
 
 After structure approval:
 
-1. **Write the plan** to `plan/YYYY-MM-DD-<feature-name>.md`
+1. **Write the plan** to `plan/future-plans/YYYY-MM-DD-<feature-name>.md`
    - Format: `YYYY-MM-DD-<feature-name>.md` where:
      - YYYY-MM-DD is today's date
      - feature-name is a brief kebab-case description
      - Optional: Include ticket reference like `YYYY-MM-DD-ENG-XXXX-description.md`
    - Examples:
-     - `2025-01-08-parent-child-tracking.md`
-     - With ticket: `2025-01-08-ENG-1478-parent-child-tracking.md`
+     - `plan/future-plans/2025-01-08-parent-child-tracking.md`
+     - With ticket: `plan/future-plans/2025-01-08-ENG-1478-parent-child-tracking.md`
 2. **Use this template structure**:
 
 ### Standard Template (Single File)
@@ -429,7 +429,7 @@ For plans over 400 lines, split into separate files in a directory:
 
 **Directory Structure:**
 ```
-plan/YYYY-MM-DD-feature-name/
+plan/future-plans/YYYY-MM-DD-feature-name/
 ├── README.md                    # Overview, dependencies, checklist
 ├── 01-authentication.md         # First phase
 ├── 02-billing.md                # Second phase
@@ -572,7 +572,7 @@ Before starting, read these files:
 1. **Present the draft plan location**:
    ```
    I've created the initial implementation plan at:
-   `plan/YYYY-MM-DD-<feature-name>.md`
+   `plan/future-plans/YYYY-MM-DD-<feature-name>.md`
 
    Please review it and let me know:
    - Are the phases properly scoped and grouped by subsystem?

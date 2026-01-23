@@ -4,7 +4,7 @@ description: Implement technical plans from thoughts/shared/plans with verificat
 
 # Implement Plan
 
-You are tasked with implementing an approved technical plan from `thoughts/shared/plans/`. These plans contain phases with specific changes and success criteria.
+You are tasked with implementing an approved technical plan from `plans/future-plans/`. These plans contain phases with specific changes and success criteria.
 
 ## Getting Started
 
@@ -43,7 +43,7 @@ If you encounter a mismatch:
 ## Verification Approach
 
 After implementing a phase:
-- Run the success criteria checks (usually `make check test` covers everything)
+- Run the success criteria checks if any(usually `make check test` covers everything)
 - Fix any issues before proceeding
 - Update your progress in both the plan and your todos
 - Check off completed items in the plan file itself using Edit

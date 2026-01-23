@@ -37,7 +37,8 @@
       "Bash(make console:*)",
       "Bash(uv python install:*)",
       "Bash(uv python pin:*)",
-      "Bash(make dev:*)"
+      "Bash(make dev:*)",
+      "Skill(review_plan)"
     ]
   }
 }

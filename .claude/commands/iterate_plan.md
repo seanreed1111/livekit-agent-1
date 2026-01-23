@@ -1,6 +1,6 @@
 ---
 description: Iterate on existing implementation plans with thorough research and updates
-model: opus
+model: sonnet
 ---
 
 # Iterate Implementation Plan
@@ -12,8 +12,8 @@ You are tasked with updating existing implementation plans based on user feedbac
 When this command is invoked:
 
 1. **Parse the input to identify**:
-   - Plan file path (e.g., `thoughts/shared/plans/2025-10-16-feature.md`)
-   - Requested changes/feedback
+   - Plan file path (e.g., `plans/future-plans/plan-name.md`)
+   - Requested changes/feedback (usually `plans/future-plans/plan-name.REVIEW.md`)
 
 2. **Handle different input scenarios**:
 
@@ -21,9 +21,9 @@ When this command is invoked:
    ```
    I'll help you iterate on an existing implementation plan.
 
-   Which plan would you like to update? Please provide the path to the plan file (e.g., `thoughts/shared/plans/2025-10-16-feature.md`).
+   Which plan would you like to update? Please provide the path to the plan file (e.g., `plans/future-plans/plan-name.md`).
 
-   Tip: You can list recent plans with `ls -lt thoughts/shared/plans/ | head`
+   Tip: You can list recent plans with `ls -lt plans/future-plans/ | head`
    ```
    Wait for user input, then re-check for feedback.
 
@@ -78,8 +78,6 @@ If the user's feedback requires understanding new code patterns or validating as
    - **thoughts-analyzer** - To extract insights from documents
 
    **Be EXTREMELY specific about directories**:
-   - If the change involves "WUI", specify `humanlayer-wui/` directory
-   - If it involves "daemon", specify `hld/` directory
    - Include full path context in prompts
 
 3. **Read any new files identified by research**:
