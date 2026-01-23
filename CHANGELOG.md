@@ -1,5 +1,155 @@
 # Changelog
 
+## PR #11: Plan Review System and Planning Command Updates (January 23, 2026)
+
+**Commit:** 8c86909
+**Branch:** `update-remove-mcdonalds-agent-plan`
+**Files changed:** 11 files (+2,851 lines, -47 lines)
+
+### ✨ New Features
+
+#### Plan Review Command (`/review_plan`)
+- **Comprehensive plan assessment system** - Evaluate implementation plan quality before execution
+  - Analyzes plans across 5 dimensions:
+    - **Accuracy** - Technical correctness and validity
+    - **Consistency** - Internal consistency and naming conventions
+    - **Clarity** - Clear, unambiguous instructions
+    - - **Completeness** - All necessary steps and context included
+    - **Executability** - Can agents execute without intervention?
+  - Generates executability score (0-100%) with severity-based recommendations
+  - Identifies critical blockers, major concerns, and minor issues
+  - Saves non-destructive reviews to `*.REVIEW.md` files
+  - Implemented in `.claude/commands/review_plan.md` (296 lines)
+  - Skill implementation in `.claude/skills/review-plan/SKILL.md` (377 lines)
+
+#### Review Scoring System
+- **Executability scores** - Objective plan quality assessment
+  - **90-100**: Excellent - Ready for execution
+  - **75-89**: Good - Minor clarifications needed
+  - **60-74**: Fair - Improvements recommended
+  - **40-59**: Poor - Major revisions required
+  - **0-39**: Critical - Cannot execute safely
+- **Priority-based recommendations** - Actionable feedback organized by severity
+  - Critical blockers that must be addressed
+  - Major concerns for significant improvements
+  - Minor issues for optional enhancements
+
+### 🔧 Improvements
+
+#### Plan Updates Based on Review Feedback
+- **Updated remove-mcdonalds-voice-agent.md** - Addressed all high-priority issues from review
+  - Added explicit fixture deletions with line numbers (all 17 fixtures listed)
+  - Added dependency cleanup phase (remove `rapidfuzz`, `click`)
+  - Moved test verification to Phase 8 (avoid import errors before config cleanup)
+  - Changed `src/tools/` cleanup to `rm -rf` for cleaner execution
+  - Specified exact line numbers for AGENTS.md updates (lines 38, 153, 343, 350)
+  - Replaced timeout-based smoke test with proper import verification
+  - **Executability Score Improvement:** 78/100 → Expected 85+/100
+
+#### Planning Command Consistency
+- **Standardized plan locations** - All planning commands now use consistent paths
+  - Updated `create_plan.md` - Changed examples to `plan/future-plans/` directory
+  - Updated `implement_plan.md` - Clarified verification approach, removed thoughts/ references
+  - Updated `iterate_plan.md` - Fixed plan paths, changed model to sonnet
+  - Ensures consistent plan organization across all commands
+
+### 📚 Documentation
+
+#### AGENTS.md Updates
+- **Added Plan Review section** - Complete guide to using `/review_plan` command
+  - When to review (before execution, complex plans, unclear requirements)
+  - Review criteria and scoring scale
+  - Usage examples and workflow integration
+  - Advisory nature of reviews (non-destructive)
+  - Added 34 lines of documentation
+
+#### README.md Updates
+- **Added Plan Review Command section** - User-facing documentation
+  - Command examples (file, directory, interactive modes)
+  - 5-dimension analysis explanation
+  - Executability scoring criteria
+  - Output format details
+  - Added 26 lines of documentation
+
+#### Plan Documentation
+- **Review example** - `remove-mcdonalds-voice-agent.REVIEW.md` (1,961 lines)
+  - Demonstrates comprehensive review output format
+  - Shows executability score calculation
+  - Includes detailed recommendations by priority
+  - Provides examples of critical, major, and minor issues
+- **Planning guide** - `review-plan-command.md` (213 lines)
+  - Implementation notes for review command
+  - Design decisions and rationale
+  - Future enhancement ideas
+
+### ⚙️ Configuration
+
+#### Settings Updates
+- **Added review_plan permission** - `.claude/settings.local.json`
+  - Enabled `Skill(review_plan)` in allowedPrompts
+  - Allows non-interactive plan review execution
+
+### Files Modified
+
+#### Commands (3 files, +29 lines)
+- `.claude/commands/create_plan.md` - Standardized paths to `plan/future-plans/`
+- `.claude/commands/implement_plan.md` - Updated plan paths, clarified verification
+- `.claude/commands/iterate_plan.md` - Fixed paths, changed model to sonnet
+
+#### Configuration (1 file, +2 lines)
+- `.claude/settings.local.json` - Added review_plan skill permission
+
+#### Documentation (2 files, +60 lines)
+- `AGENTS.md` - Added Plan Review section with guidelines
+- `README.md` - Added Plan Review Command documentation
+
+#### Plans (1 file, +206 lines)
+- `plan/future-plans/remove-mcdonalds-voice-agent.md` - Updated based on review feedback
+  - Added Phase 5.4 (dependency cleanup)
+  - Specified exact line numbers for all edits
+  - Added plan update summary at top
+
+### Files Added
+
+#### Commands (1 file, 296 lines)
+- `.claude/commands/review_plan.md` - Plan review command implementation
+
+#### Skills (1 file, 377 lines)
+- `.claude/skills/review-plan/SKILL.md` - Plan review skill with analysis framework
+
+#### Documentation (2 files, 2,174 lines)
+- `plan/future-plans/remove-mcdonalds-voice-agent.REVIEW.md` - Example review output
+- `plan/future-plans/review-plan-command.md` - Planning and implementation notes
+
+### Migration Notes
+
+This release introduces a systematic approach to plan quality assessment:
+
+#### Key Benefits
+- **Prevents costly mistakes** - Catch issues before execution begins
+- **Improves plan quality** - Objective scoring drives better planning
+- **Reduces rework** - Clear recommendations before implementation
+- **Ensures executability** - Focus on whether agents can actually execute the plan
+- **Non-destructive** - Reviews are advisory, original plans unchanged
+
+#### When to Use
+- After creating complex plans with `/create_plan`
+- Before starting plan execution with `/implement_plan`
+- When plans seem ambiguous or incomplete
+- Before assigning work to multiple agents
+- Periodically for long-running plans
+
+#### Design Philosophy
+- Plans should score 75+ for safe execution
+- Reviews analyze both what to do and how to do it
+- Recommendations are prioritized by severity
+- Reviews provide actionable feedback, not just criticism
+- Original plans remain untouched - reviews are separate files
+
+The plan review system enables higher quality planning and safer plan execution across all development workflows.
+
+---
+
 ## PR #10: Fix Drive-Thru Agent Responsiveness (January 22, 2026)
 
 **Commit:** 1e2687b
