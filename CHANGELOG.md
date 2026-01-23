@@ -1,5 +1,323 @@
 # Changelog
 
+## PR #10: Fix Drive-Thru Agent Responsiveness (January 22, 2026)
+
+**Commit:** 1e2687b
+**Branch:** `debug-session`
+**Files changed:** 2 files (+98 lines, -162 lines)
+
+### 🐛 Bug Fixes
+
+#### Critical: Agent Now Responds to Customer Orders
+- **Fixed tool registration bug** - The drive-thru agent was greeting customers but not responding to their orders. Root cause: order management tools (add_item_to_order, complete_order, remove_item_from_order) were created but never passed to the LiveKit Agent parent class.
+  - **What was broken**: Agent would say "Welcome to McDonald's! What can I get for you today?" but become unresponsive when customers placed orders
+  - **What's fixed**: Agent now properly calls tools to add items, confirm orders, and save final orders to JSON
+  - **Technical change**: Reordered `DriveThruAgent.__init__()` to create tools before calling `super().__init__()` and pass them via `tools` parameter
+  - **Impact**: Agent can now complete full ordering workflows from greeting to order completion
+
+### 🔍 Improvements
+
+#### Enhanced Diagnostic Logging
+- **Tool registration verification** - Added logging to confirm 3 tools are registered when agent starts
+  - Logs show "Agent has 3 tools available" in both console and dev modes
+  - Helps diagnose similar issues in the future
+  - Implemented in `src/drive_thru_agent.py` and `src/agent.py`
+
+### Technical Details
+
+**Root Cause Analysis:**
+- Location: `src/drive_thru_agent.py:51`
+- Issue: `super().__init__(instructions=...)` called without `tools` parameter
+- Tools created at lines 64-66 but never passed to parent Agent class
+- Result: LLM had no access to ordering functions
+
+**Fix Applied:**
+1. Store dependencies first (llm, menu_provider, session_id)
+2. Create OrderStateManager
+3. Create tools BEFORE calling super().__init__()
+4. Pass tools to parent: `super().__init__(instructions=..., tools=self._tools)`
+
+**Verified Working:**
+- ✅ Console mode: Confirmed "Agent has 3 tools available"
+- ✅ Dev mode: Agent starts and registers with LiveKit Cloud
+- ✅ Tool registration: All 3 tools accessible to LLM
+
+---
+
+## PR #9: Enhanced Makefile with Minimalism Standards (January 22, 2026)
+
+**Commits:** c808878 to b39200e
+**Branch:** `enhance-makefile-skill`
+**Files changed:** 17 files (+1,319 lines, -183 lines)
+
+### Features
+
+#### Makefile Skill System
+- **Comprehensive Makefile skill** - New standardized approach to Makefile creation and maintenance
+  - Minimalism philosophy: "The best Makefile is the shortest one that meets the user's needs"
+  - Importance-first ordering: Most frequently used commands appear first
+  - Variable-based scope: Single targets with `SCOPE` and `ARGS` variables instead of target proliferation
+  - Default to 5-8 core targets for most projects
+  - Implemented in `.claude/skills/makefile/SKILL.md` (348 lines)
+
+#### Reference Implementation
+- **Complete Makefile example** - Production-ready reference implementation
+  - Demonstrates all patterns and best practices
+  - Full color-coded help system
+  - Variable defaults and scope selection
+  - Comprehensive error handling
+  - Implemented in `.claude/skills/makefile/references/Makefile` (519 lines)
+
+### Makefile Improvements
+
+#### Structure & Organization
+- **Importance-first ordering** - Targets ordered by frequency of use, not alphabetically
+  1. `help` - Always first
+  2. `console`, `dev` - Most frequently used commands
+  3. `setup` - Installation and configuration
+  4. `test` - Testing
+  5. `format`, `lint` - Code quality
+  6. `clean` - Utilities
+- **Clear section headers** - Visual separators with meaningful labels
+- **Color-coded output** - Blue (info), Green (success), Yellow (warnings), Cyan (headers)
+- **Quick reference at top** - Top 3-5 most important commands prominently displayed
+
+#### Enhanced Help System
+- **Comprehensive `make help`** - Organized by importance with realistic examples
+  - Most common commands section
+  - Setup instructions
+  - Development workflow commands
+  - Production deployment
+  - Utilities
+- **Usage examples** - Real command examples for every target
+- **Variable documentation** - Clear examples of `SCOPE` and `ARGS` usage
+
+#### Testing Flexibility
+- **Scope-based testing** - Single `test` target with multiple scopes
+  - `make test` - Run all tests (default)
+  - `make test SCOPE=unit` - Unit tests only
+  - `make test SCOPE=integration` - Integration tests only
+  - `make test ARGS="-k order"` - Pass arguments to pytest
+- **Eliminated target proliferation** - Replaced potential `test-unit`, `test-integration` targets with scope-based approach
+
+#### User Experience
+- **Default goal** - `make` without arguments shows helpful information
+- **Consistent formatting** - All commands follow same patterns
+- **Clear error messages** - Helpful hints when commands are used incorrectly
+
+### Documentation
+
+#### Makefile Standards Documentation
+- **SKILL.md** - Complete guide to Makefile best practices (348 lines)
+  - Philosophy and core principles
+  - Implementation patterns
+  - Prohibited anti-patterns
+  - Best practices and examples
+  - Refactoring guide
+  - Summary checklist for new targets
+
+#### Pattern Examples
+- **Variable defaults and scope selection** - How to use `SCOPE` and `ARGS`
+- **User-friendly help output** - Color-coded help format
+- **Argument pass-through** - Flexible command customization
+- **Target ordering guidelines** - Importance over alphabetization
+- **Error handling patterns** - User-friendly validation
+
+### Refactoring & Cleanup
+
+#### Code Quality
+- **Reduced complexity** - From potentially 12+ targets down to 8 essential targets
+- **Eliminated redundancy** - Single targets with variables instead of similar targets
+- **Improved discoverability** - Importance-first ordering makes common commands easy to find
+
+#### File Organization
+- **Plan documentation moved** - Relocated `plan/thoughts/` to `docs/planning/`
+  - `drive-thru-llm/` subdirectory and all its contents
+  - `mcdonalds-drive-thru-agent-plan.md`
+
+### Files Modified
+
+#### Build System
+- `Makefile` - Complete refactoring with new standards (+153 lines)
+  - Importance-first target ordering
+  - Color-coded output
+  - Enhanced help system
+  - Variable-based scoping
+  - Clear section organization
+
+#### Documentation
+- `README.md` - Enhanced Makefile documentation (+475 lines)
+  - Quick Commands section added
+  - Makefile usage examples
+  - Development workflow documentation
+
+#### Configuration
+- `.claude/settings.local.json` - Updated skill configuration (+5 lines)
+- `.gitignore` - Added patterns for skill-related files (+2 lines)
+
+### Files Added
+- `.claude/skills/makefile/SKILL.md` - Makefile standards (348 lines)
+- `.claude/skills/makefile/references/Makefile` - Reference implementation (519 lines)
+
+### Files Moved
+- `plan/thoughts/drive-thru-llm/` → `docs/planning/drive-thru-llm/` (7 files)
+- `plan/thoughts/mcdonalds-drive-thru-agent-plan.md` → `docs/planning/`
+
+### Migration Notes
+
+This release establishes comprehensive standards for Makefile creation and maintenance:
+
+#### Key Benefits
+- **Minimalism**: Fewer targets mean less maintenance and easier discovery
+- **Flexibility**: Variables provide customization without target proliferation
+- **Usability**: Color-coded help and importance-first ordering improve UX
+- **Maintainability**: Clear patterns and standards ensure consistency
+- **Discoverability**: Most important commands appear first
+
+#### Design Philosophy
+- Challenge every new target: "Can I use an existing target with variables instead?"
+- Default to 5-8 core targets for most projects
+- Order by importance, not alphabetically
+- Use `SCOPE` for variations, `ARGS` for customization
+- Provide helpful error messages and usage hints
+
+The Makefile skill can be applied to any project requiring build automation.
+
+---
+
+## PR #8: Claude Code Commands and Skills (January 22, 2026)
+
+**Commits:** b0b44bf to c808878
+**Branch:** `update-claude`
+**Files changed:** 47 files (+6,982 lines, -15 lines)
+
+### Features
+
+#### Claude Code Agent System
+- **7 specialized agents** - Pre-configured agents for common development tasks
+  - `bdd-scenario-writer` - Generates behavior-driven development scenarios (482 lines)
+  - `codebase-analyzer` - Analyzes implementation details (143 lines)
+  - `codebase-locator` - Finds files, directories, and components (122 lines)
+  - `codebase-pattern-finder` - Discovers similar implementations and patterns (227 lines)
+  - `thoughts-analyzer` - Deep dive research for thoughts directory (145 lines)
+  - `thoughts-locator` - Discovers relevant documents in thoughts/ (127 lines)
+  - `web-search-researcher` - Web research for modern information (109 lines)
+
+#### Claude Code Commands
+- **35 workflow commands** - Complete suite of development commands
+
+  **Planning & Research:**
+  - `create_plan` - Create detailed implementation plans (449 lines)
+  - `create_plan_generic` - Generic planning with research (442 lines)
+  - `create_plan_nt` - Planning without thoughts directory (439 lines)
+  - `iterate_plan` - Iterate on existing plans (249 lines)
+  - `iterate_plan_nt` - Iterate without thoughts (238 lines)
+  - `validate_plan` - Validate against success criteria (166 lines)
+  - `research_codebase` - Document as-is codebase (213 lines)
+  - `research_codebase_generic` - Generic codebase research (179 lines)
+  - `research_codebase_nt` - Research without thoughts (190 lines)
+
+  **Git Workflow:**
+  - `commit` - Create commits without Claude attribution (44 lines)
+  - `ci_commit` - Create commits with clear messages (34 lines)
+  - `commit-push-pr` - Commit, push, and open PR (19 lines)
+  - `describe_pr` - Generate PR descriptions (76 lines)
+  - `ci_describe_pr` - Comprehensive PR descriptions (75 lines)
+  - `describe_pr_nt` - PR descriptions without thoughts (89 lines)
+
+  **Development Workflow:**
+  - `implement_plan` - Execute technical plans (84 lines)
+  - `debug` - Debug issues via logs, DB, git history (200 lines)
+  - `local_review` - Set up worktree for branch review (48 lines)
+  - `create_worktree` - Worktree creation utility (41 lines)
+  - `create_handoff` - Transfer work to another session (95 lines)
+  - `resume_handoff` - Resume from handoff document (217 lines)
+
+  **Linear Integration:**
+  - `linear` - Manage Linear tickets (388 lines)
+  - `ralph_research` - Research highest priority ticket (81 lines)
+  - `ralph_plan` - Plan for highest priority ticket (59 lines)
+  - `ralph_impl` - Implement small tickets (33 lines)
+  - `oneshot` - Research and launch planning (6 lines)
+  - `oneshot_plan` - Execute ralph plan and implementation (6 lines)
+  - `founder_mode` - Create ticket and PR for experiments (19 lines)
+
+#### Claude Code Skills
+- **6 development skills** - Best practices and standards
+  - `architecting-systems` - System architecture design (62 lines)
+  - `changelog-generator` - Transform commits to user-friendly changelogs (104 lines)
+  - `design` - Minimal design for dashboards and admin UIs (170 lines)
+  - `writing-plans` - Create implementation plans with task grouping (116 lines)
+  - `writing-tests` - Behavior-focused tests with Testing Trophy (85 lines)
+  - Plus skills already present: `systematic-debugging`, `handling-errors`, `migrating-code`, etc.
+
+### Documentation
+
+#### Skill Reference Documentation
+- **Changelog style guide** - `.claude/skills/changelog-generator/references/CHANGELOG_STYLE.md` (316 lines)
+  - Professional changelog formatting
+  - User-friendly language guidelines
+  - Categorization standards
+  - Examples and anti-patterns
+
+- **Design craft details** - `.claude/skills/design/references/craft-details.md` (109 lines)
+  - Jony Ive-level design principles
+  - Dashboard and admin interface standards
+  - Minimal, precise design guidelines
+
+- **Test writing references**:
+  - Python testing guide - `.claude/skills/writing-tests/references/python.md` (209 lines)
+  - TypeScript/React testing - `.claude/skills/writing-tests/references/typescript-react.md` (237 lines)
+
+### Configuration
+
+#### Claude Code Settings
+- **Local settings** - `.claude/settings.local.json` (32 lines)
+  - Agent configurations
+  - Command definitions
+  - Skill registrations
+- **Menu-specific settings** - `menus/mcdonalds/.claude/settings.local.json` (8 lines)
+
+### Files Added
+
+#### Agents (1,355 lines)
+- 7 specialized agent definition files in `.claude/agents/`
+
+#### Commands (3,532 lines)
+- 35 workflow command files in `.claude/commands/`
+
+#### Skills (1,201 lines)
+- 6 skill definition files with comprehensive documentation
+- 3 reference documentation files (862 lines)
+
+#### Configuration (40 lines)
+- 2 settings files for Claude Code integration
+
+### Files Modified
+- `.gitignore` - Removed 15 outdated patterns
+
+### Migration Notes
+
+This release adds comprehensive Claude Code integration for AI-assisted development:
+
+#### Key Capabilities
+- **Specialized agents** for focused tasks (BDD, codebase analysis, research)
+- **Workflow commands** covering entire dev lifecycle
+- **Best practice skills** with reference documentation
+- **Linear integration** for ticket management
+- **Git workflow automation** with commit and PR generation
+- **Planning and execution** with validation and handoffs
+
+#### Integration Points
+- Commands accessible via `/command-name` syntax
+- Skills provide standards and patterns
+- Agents handle complex multi-step tasks
+- Settings allow customization per project
+
+The system enables AI-assisted development while maintaining code quality and consistency.
+
+---
+
 ## PR #6: Voice Ordering System (January 22, 2026)
 
 **Commits:** 90a0ae5 to d442c03

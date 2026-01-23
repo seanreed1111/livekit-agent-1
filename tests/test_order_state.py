@@ -13,7 +13,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from src.order_state_manager import OrderItem
+from order_state_manager import OrderItem
 
 # ============================================================================
 # OrderItem Tests

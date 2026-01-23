@@ -10,9 +10,9 @@ from pathlib import Path
 
 import pytest
 
-from src.drive_thru_agent import DriveThruAgent
-from src.drive_thru_llm import DriveThruLLM
-from src.menu_provider import MenuProvider
+from drive_thru_agent import DriveThruAgent
+from drive_thru_llm import DriveThruLLM
+from menu_provider import MenuProvider
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def agent_with_real_components(tmp_path):
 
     # Create menu provider
     menu_provider = MenuProvider(
-        "menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json"
+        "src/menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json"
     )
 
     # Create mock base LLM (we won't actually call it in these tests)

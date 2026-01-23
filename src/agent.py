@@ -21,6 +21,82 @@ from session_handler import DriveThruSessionHandler
 load_dotenv(".env.local")
 
 
+def _prewarm(proc: JobProcess):
+    """Module-level prewarm function for loading VAD model."""
+    proc.userdata["vad"] = silero.VAD.load()
+
+
+async def _handle_rtc_session(ctx: JobContext):
+    """Module-level RTC session handler."""
+    from livekit.agents import NOT_GIVEN, AgentSession, room_io
+    from livekit.plugins import noise_cancellation
+    from livekit.plugins.turn_detector.multilingual import MultilingualModel
+
+    from factories import create_stt, create_tts
+
+    # Initialize config and handler for this worker process
+    config = AppConfig()
+    handler = DriveThruSessionHandler(config)
+
+    session_id = ctx.room.name
+
+    logger.info(f"Starting drive-thru session for room: {session_id}")
+
+    # Create drive-thru agent
+    drive_thru_agent = await handler.create_agent(session_id)
+
+    # Verify agent has tools registered
+    logger.info(f"Agent has {len(drive_thru_agent.tools)} tools available")
+
+    # Create voice pipeline components
+    stt = create_stt(config.pipeline)
+    tts = create_tts(config.pipeline)
+
+    # Set up turn detection and VAD
+    turn_detection = (
+        MultilingualModel()
+        if config.session.use_multilingual_turn_detector
+        else NOT_GIVEN
+    )
+    vad = ctx.proc.userdata.get("vad") or NOT_GIVEN
+
+    # Create AgentSession
+    session = AgentSession(
+        stt=stt,
+        llm=drive_thru_agent.llm,
+        tts=tts,
+        turn_detection=turn_detection,
+        vad=vad,
+        preemptive_generation=config.session.preemptive_generation,
+    )
+
+    # Configure room options
+    room_options = room_io.RoomOptions()
+    if config.session.enable_noise_cancellation:
+        room_options = room_io.RoomOptions(
+            audio_input=room_io.AudioInputOptions(
+                noise_cancellation=noise_cancellation.BVC(),
+            ),
+        )
+
+    # Start the session
+    await session.start(
+        agent=drive_thru_agent,
+        room=ctx.room,
+        room_options=room_options,
+    )
+
+    logger.info("Session started, connecting to room")
+
+    # Join the room
+    await ctx.connect()
+
+    logger.info("Connected to room successfully")
+
+    # Greet the user
+    await session.say("Welcome to McDonald's! What can I get for you today?")
+
+
 @click.group()
 def agent_cli():
     """McDonald's Drive-Thru Agent CLI."""
@@ -38,7 +114,6 @@ def console():
     async def run_console():
         """Async console runner."""
         from livekit.agents import AgentSession, NOT_GIVEN
-        from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
         from factories import create_stt, create_tts
 
@@ -54,16 +129,16 @@ def console():
 
         drive_thru_agent = await handler.create_agent(session_id)
 
+        # Verify agent has tools registered
+        logger.info(f"Agent has {len(drive_thru_agent.tools)} tools available")
+
         # Create voice pipeline components
         stt = create_stt(config.pipeline)
         tts = create_tts(config.pipeline)
 
         # Create AgentSession with drive-thru LLM
-        turn_detection = (
-            MultilingualModel()
-            if config.session.use_multilingual_turn_detector
-            else NOT_GIVEN
-        )
+        # Console mode doesn't support MultilingualModel (requires job context)
+        turn_detection = NOT_GIVEN
 
         session = AgentSession(
             stt=stt,
@@ -91,85 +166,10 @@ def dev():
 
     This mode connects to LiveKit for testing with real voice interactions.
     """
-    from livekit.agents import NOT_GIVEN, AgentSession, room_io
-    from livekit.plugins import noise_cancellation
-    from livekit.plugins.turn_detector.multilingual import MultilingualModel
-
-    from factories import create_stt, create_tts
-
-    # Load configuration
-    config = AppConfig()
-
-    # Create session handler
-    handler = DriveThruSessionHandler(config)
-
     # Create server
     server = AgentServer()
-
-    # Setup prewarm for VAD
-    @server.setup_fnc
-    def prewarm(proc: JobProcess):
-        """Prewarm function for loading VAD model."""
-        proc.userdata["vad"] = silero.VAD.load()
-
-    # Register session handler
-    @server.rtc_session()
-    async def handle_rtc_session(ctx: JobContext):
-        """Handle an RTC session."""
-        session_id = ctx.room.name  # Use room name as session ID
-
-        logger.info(f"Starting drive-thru session for room: {session_id}")
-
-        # Create drive-thru agent
-        drive_thru_agent = await handler.create_agent(session_id)
-
-        # Create voice pipeline components
-        stt = create_stt(config.pipeline)
-        tts = create_tts(config.pipeline)
-
-        # Set up turn detection and VAD
-        turn_detection = (
-            MultilingualModel()
-            if config.session.use_multilingual_turn_detector
-            else NOT_GIVEN
-        )
-        vad = ctx.proc.userdata.get("vad") or NOT_GIVEN
-
-        # Create AgentSession
-        session = AgentSession(
-            stt=stt,
-            llm=drive_thru_agent.llm,  # Use the DriveThruLLM
-            tts=tts,
-            turn_detection=turn_detection,
-            vad=vad,
-            preemptive_generation=config.session.preemptive_generation,
-        )
-
-        # Configure room options
-        room_options = room_io.RoomOptions()
-        if config.session.enable_noise_cancellation:
-            room_options = room_io.RoomOptions(
-                audio_input=room_io.AudioInputOptions(
-                    noise_cancellation=noise_cancellation.BVC(),
-                ),
-            )
-
-        # Start the session
-        await session.start(
-            agent=drive_thru_agent,
-            room=ctx.room,
-            room_options=room_options,
-        )
-
-        logger.info("Session started, connecting to room")
-
-        # Join the room and connect to the user
-        await ctx.connect()
-
-        logger.info("Connected to room successfully")
-
-        # Greet the user
-        await session.say("Welcome to McDonald's! What can I get for you today?")
+    server.setup_fnc = _prewarm
+    server.rtc_session()(_handle_rtc_session)
 
     logger.info("Starting drive-thru agent in dev mode")
     cli.run_app(server)
@@ -181,85 +181,10 @@ def start():
 
     This is the production entry point for deployment.
     """
-    from livekit.agents import NOT_GIVEN, AgentSession, room_io
-    from livekit.plugins import noise_cancellation
-    from livekit.plugins.turn_detector.multilingual import MultilingualModel
-
-    from factories import create_stt, create_tts
-
-    # Load configuration
-    config = AppConfig()
-
-    # Create session handler
-    handler = DriveThruSessionHandler(config)
-
     # Create server
     server = AgentServer()
-
-    # Setup prewarm for VAD
-    @server.setup_fnc
-    def prewarm(proc: JobProcess):
-        """Prewarm function for loading VAD model."""
-        proc.userdata["vad"] = silero.VAD.load()
-
-    # Register session handler
-    @server.rtc_session()
-    async def handle_rtc_session(ctx: JobContext):
-        """Handle an RTC session."""
-        session_id = ctx.room.name
-
-        logger.info(f"Production session for room: {session_id}")
-
-        # Create drive-thru agent
-        drive_thru_agent = await handler.create_agent(session_id)
-
-        # Create voice pipeline components
-        stt = create_stt(config.pipeline)
-        tts = create_tts(config.pipeline)
-
-        # Set up turn detection and VAD
-        turn_detection = (
-            MultilingualModel()
-            if config.session.use_multilingual_turn_detector
-            else NOT_GIVEN
-        )
-        vad = ctx.proc.userdata.get("vad") or NOT_GIVEN
-
-        # Create AgentSession
-        session = AgentSession(
-            stt=stt,
-            llm=drive_thru_agent.llm,  # Use the DriveThruLLM
-            tts=tts,
-            turn_detection=turn_detection,
-            vad=vad,
-            preemptive_generation=config.session.preemptive_generation,
-        )
-
-        # Configure room options
-        room_options = room_io.RoomOptions()
-        if config.session.enable_noise_cancellation:
-            room_options = room_io.RoomOptions(
-                audio_input=room_io.AudioInputOptions(
-                    noise_cancellation=noise_cancellation.BVC(),
-                ),
-            )
-
-        # Start the session
-        await session.start(
-            agent=drive_thru_agent,
-            room=ctx.room,
-            room_options=room_options,
-        )
-
-        logger.info("Session started, connecting to room")
-
-        # Join the room
-        await ctx.connect()
-
-        logger.info("Connected to room successfully")
-
-        # Greet the user
-        await session.say("Welcome to McDonald's! What can I get for you today?")
+    server.setup_fnc = _prewarm
+    server.rtc_session()(_handle_rtc_session)
 
     logger.info("Starting drive-thru agent in production mode")
     cli.run_app(server)
@@ -272,15 +197,15 @@ def download_files():
     Run this before your first session to download necessary models.
     """
     from livekit.plugins import silero
-    from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
     click.echo("Downloading Silero VAD model...")
     silero.VAD.load()
     click.echo("✓ Silero VAD model downloaded")
 
-    click.echo("Downloading multilingual turn detector...")
-    MultilingualModel.load()
-    click.echo("✓ Multilingual turn detector downloaded")
+    click.echo(
+        "\nNote: Multilingual turn detector will be downloaded automatically on first use "
+        "(requires job context)"
+    )
 
     click.echo("\nAll models downloaded successfully!")
 

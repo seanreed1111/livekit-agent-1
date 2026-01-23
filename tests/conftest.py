@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from menus.mcdonalds.models import Item, Menu, Modifier
-from src.menu_provider import MenuProvider
+from menu_provider import MenuProvider
 
 # ============================================================================
 # Menu Data Fixtures
@@ -152,7 +152,7 @@ def test_menu_provider(tmp_path, test_menu_data) -> MenuProvider:
 @pytest.fixture
 def real_menu_provider() -> MenuProvider:
     """Create MenuProvider with real menu file."""
-    menu_path = "menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json"
+    menu_path = "src/menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json"
     return MenuProvider(menu_path)
 
 
@@ -166,6 +166,7 @@ def real_menu_path() -> Path:
     """Get the path to the real McDonald's menu JSON file."""
     return (
         Path(__file__).parent.parent
+        / "src"
         / "menus"
         / "mcdonalds"
         / "transformed-data"
@@ -187,7 +188,7 @@ def temp_output_dir(tmp_path):
 @pytest.fixture
 def order_manager(temp_output_dir):
     """Create OrderStateManager with temp directory."""
-    from src.order_state_manager import OrderStateManager
+    from order_state_manager import OrderStateManager
 
     return OrderStateManager(session_id="test-session-123", output_dir=temp_output_dir)
 
@@ -200,14 +201,14 @@ def order_manager(temp_output_dir):
 @pytest.fixture
 def menu_provider() -> MenuProvider:
     """Create MenuProvider with real menu for order tools tests."""
-    menu_path = "menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json"
+    menu_path = "src/menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json"
     return MenuProvider(menu_path)
 
 
 @pytest.fixture
 def order_state_manager(tmp_path):
     """Create OrderStateManager with temp directory for order tools tests."""
-    from src.order_state_manager import OrderStateManager
+    from order_state_manager import OrderStateManager
 
     return OrderStateManager(
         session_id="test-tools-session", output_dir=str(tmp_path / "orders")
@@ -217,7 +218,7 @@ def order_state_manager(tmp_path):
 @pytest.fixture
 def order_tools(order_state_manager, menu_provider):
     """Create order tools with real dependencies for integration tests."""
-    from src.tools.order_tools import create_order_tools
+    from tools.order_tools import create_order_tools
 
     return create_order_tools(order_state_manager, menu_provider)
 
@@ -231,7 +232,7 @@ def order_tools(order_state_manager, menu_provider):
 def mock_drive_thru_llm():
     """Create a mock DriveThruLLM for testing."""
     from unittest.mock import Mock
-    from src.drive_thru_llm import DriveThruLLM
+    from drive_thru_llm import DriveThruLLM
 
     return Mock(spec=DriveThruLLM)
 
@@ -241,7 +242,7 @@ def drive_thru_llm(real_menu_provider):
     """Create real DriveThruLLM with menu context injection."""
     from unittest.mock import Mock
     from livekit.agents.llm import LLM
-    from src.drive_thru_llm import DriveThruLLM
+    from drive_thru_llm import DriveThruLLM
 
     # Create a mock base LLM
     mock_base_llm = Mock(spec=LLM)
@@ -262,7 +263,7 @@ def drive_thru_llm(real_menu_provider):
 @pytest.fixture
 def drive_thru_agent(mock_drive_thru_llm, real_menu_provider, tmp_path):
     """Create DriveThruAgent with mock LLM for testing."""
-    from src.drive_thru_agent import DriveThruAgent
+    from drive_thru_agent import DriveThruAgent
 
     return DriveThruAgent(
         session_id="test-agent-session",
@@ -275,7 +276,7 @@ def drive_thru_agent(mock_drive_thru_llm, real_menu_provider, tmp_path):
 @pytest.fixture
 def real_drive_thru_agent(drive_thru_llm, real_menu_provider, tmp_path):
     """Create DriveThruAgent with real DriveThruLLM for E2E tests."""
-    from src.drive_thru_agent import DriveThruAgent
+    from drive_thru_agent import DriveThruAgent
 
     return DriveThruAgent(
         session_id="test-e2e-session",

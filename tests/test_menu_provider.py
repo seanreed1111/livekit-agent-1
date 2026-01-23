@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from src.menu_provider import MenuProvider
+from menu_provider import MenuProvider
 
 
 # ============================================================================

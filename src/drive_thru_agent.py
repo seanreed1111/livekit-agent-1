@@ -11,12 +11,16 @@ Key Principles:
 - Defines Persona: Sets instructions and conversation style
 """
 
+import logging
+
 from livekit.agents import Agent
 
-from src.drive_thru_llm import DriveThruLLM
-from src.menu_provider import MenuProvider
-from src.order_state_manager import OrderStateManager
-from src.tools.order_tools import create_order_tools
+from drive_thru_llm import DriveThruLLM
+from menu_provider import MenuProvider
+from order_state_manager import OrderStateManager
+from tools.order_tools import create_order_tools
+
+logger = logging.getLogger(__name__)
 
 
 class DriveThruAgent(Agent):
@@ -47,23 +51,26 @@ class DriveThruAgent(Agent):
             menu_provider: MenuProvider for menu access
             output_dir: Directory for order files
         """
-        # Initialize Agent with instructions
-        super().__init__(instructions=self._get_instructions())
+        # Store dependencies first
+        self._llm = llm
+        self._menu_provider = menu_provider
+        self._session_id = session_id
 
         # Create OrderStateManager for this session (agent owns it)
         self._order_state = OrderStateManager(
             session_id=session_id, output_dir=output_dir
         )
 
-        # Store dependencies
-        self._llm = llm
-        self._menu_provider = menu_provider
-        self._session_id = session_id
-
-        # Create tools with dependencies injected
+        # Create tools with dependencies injected BEFORE calling super().__init__()
         self._tools = create_order_tools(
             order_state=self._order_state, menu_provider=self._menu_provider
         )
+
+        # Log tool creation for diagnostics
+        logger.info(f"Created {len(self._tools)} tools for drive-thru agent")
+
+        # Initialize Agent with instructions AND tools
+        super().__init__(instructions=self._get_instructions(), tools=self._tools)
 
     def _get_instructions(self) -> str:
         """Get agent instructions/persona.

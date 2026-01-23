@@ -1,116 +1,68 @@
 ---
 name: writing-plans
-description: Create implementation plans with tasks grouped by subsystem. Related tasks share agent context; groups parallelize across subsystems.
+description: Create implementation plans through interactive research and discovery. Routes to /create_plan command.
 ---
 
 # Writing Plans
 
-Write step-by-step implementation plans for agentic execution. Each task should be a **complete unit of work** that one agent handles entirely.
+## When to Use
 
-**Save to:** `**/plans/YYYY-MM-DD-<feature-name>.md`
+Invoke this skill when you need to:
+- Create implementation plans for new features or tasks
+- Plan complex refactoring or architectural changes
+- Document step-by-step approaches for multi-phase work
+- Organize work into executable tasks with clear dependencies
+- Plan features that span multiple subsystems or files
 
-## Plan Template
+## What Happens
 
-````markdown
-# [Feature Name] Implementation Plan
+This skill **delegates to the /create_plan command**, which provides:
+- Interactive research process with sub-agent analysis
+- Comprehensive codebase investigation before planning
+- Iterative plan development with user collaboration
+- Structured templates with dependencies and success criteria
+- Plans saved to `plan/YYYY-MM-DD-<feature-name>.md`
 
-> **Status:** DRAFT | APPROVED | IN_PROGRESS | COMPLETED
+The command will:
+1. Gather context through parallel research tasks
+2. Analyze the codebase to understand current state
+3. Collaborate with you on approach and structure
+4. Create a detailed, actionable implementation plan
+5. Iterate based on your feedback until approved
 
-## Specification
+## Invocation
 
-**Goal:** [What we're building and why]
+To use this skill:
 
-**Success Criteria:**
+```
+/writing-plans
+```
 
-- [ ] Criterion 1
-- [ ] Criterion 2
+Or with context:
 
-## Context Loading
+```
+/writing-plans <task description>
+```
 
-_Run before starting:_
+This will automatically invoke the `/create_plan` command with the appropriate parameters.
+
+## Output Location
+
+Plans are saved to:
+- Simple plans: `plan/YYYY-MM-DD-<feature-name>.md`
+- Large plans (>400 lines): `plan/YYYY-MM-DD-<feature-name>/` directory with multiple files
+
+## Quick Examples
 
 ```bash
-read src/relevant/file.ts
-glob src/feature/**/*.ts
+# Create a plan for a new feature
+/writing-plans Add user authentication system
+
+# Create a plan from existing ticket
+/writing-plans See ticket at docs/tickets/eng-123.md
+
+# Start interactive planning session
+/writing-plans
 ```
 
-## Tasks
-
-### Task 1: [Complete Feature Unit]
-
-**Context:** `src/auth/`, `tests/auth/`
-
-**Steps:**
-
-1. [ ] Create `src/auth/login.ts` with authentication logic
-2. [ ] Add tests in `tests/auth/login.test.ts`
-3. [ ] Export from `src/auth/index.ts`
-
-**Verify:** `npm test -- tests/auth/`
-
----
-
-### Task 2: [Another Complete Unit]
-
-**Context:** `src/billing/`
-
-**Steps:**
-
-1. [ ] ...
-
-**Verify:** `npm test -- tests/billing/`
-````
-
-## Task Sizing
-
-A task includes **everything** to complete one logical unit:
-
-- Implementation + tests + types + exports
-- All steps a single agent should do together
-
-**Right-sized:** "Add user authentication" - one agent does model, service, tests, types
-**Wrong:** Separate tasks for model, service, tests - these should be one task
-
-**Bundle trivial items:** Group small related changes (add export, update config, rename) into one task.
-
-## Parallelization & Grouping
-
-During execution, tasks are **grouped by subsystem** to share agent context. Structure your plan to make grouping clear:
-
-```markdown
-## Authentication Tasks          ← These will run in one agent
-### Task 1: Add login
-### Task 2: Add logout
-
-## Billing Tasks                 ← These will run in another agent (parallel)
-### Task 3: Add billing API
-### Task 4: Add webhooks
-
-## Integration Tasks             ← Sequential (depends on above)
-### Task 5: Wire auth + billing
-```
-
-**Execution model:**
-- Tasks under same `##` heading → grouped into one agent
-- Groups touching different subsystems → run in parallel
-- Max 3-4 tasks per group (split larger sections)
-
-Tasks in the **same subsystem** should be sequential or combined into one task.
-
-## Rules
-
-1. **Explicit paths:** Say "create `src/utils/helpers.ts`" not "create a utility"
-2. **Context per task:** List files the agent should read first
-3. **Verify every task:** End with a command that proves it works
-4. **One agent per task:** All steps in a task are handled by the same agent
-
-## Large Plans
-
-For plans over ~1000 lines, split into phases in a folder:
-
-```
-**/plans/YYYY-MM-DD-feature/
-├── README.md           # Overview + phase tracking
-├── phase-1-setup.md
-└── phase-2-feature.md
-```
+The command will guide you through the planning process step by step.

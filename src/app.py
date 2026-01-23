@@ -4,12 +4,14 @@ This module contains the main application class and agent implementation,
 refactored to use dependency injection for STT, LLM, and TTS components.
 """
 
+import sys
+
 from dotenv import load_dotenv
-from livekit.agents import Agent, AgentServer, JobProcess, cli
+from livekit.agents import Agent, AgentServer, JobContext, JobProcess, cli
 from livekit.plugins import silero
 from loguru import logger
 
-from config import AppConfig, PipelineConfig
+from config import AppConfig
 from factories import create_llm, create_stt, create_tts
 from session_handler import SessionHandler
 
@@ -35,66 +37,73 @@ You are curious, friendly, and have a sense of humor."""
         )
 
 
-class VoiceAgentApp:
-    """Voice agent application with dependency injection.
+def _prewarm(proc: JobProcess):
+    """Module-level prewarm function for loading VAD model."""
+    proc.userdata["vad"] = silero.VAD.load()
 
-    This class encapsulates the voice agent application and uses dependency injection
-    to provide STT, LLM, and TTS components, enabling testability and flexibility.
+
+async def _handle_session(ctx: JobContext):
+    """Module-level session handler."""
+    # Initialize config and handler for this worker process
+    config = AppConfig()
+
+    # Create components
+    stt = create_stt(config.pipeline)
+    llm = create_llm(config.pipeline)
+    tts = create_tts(config.pipeline)
+
+    # Create agent
+    agent = Assistant(instructions=config.agent.instructions)
+
+    # Create session handler with injected dependencies
+    session_handler = SessionHandler(
+        stt=stt,
+        llm=llm,
+        tts=tts,
+        agent=agent,
+        session_config=config.session,
+    )
+
+    await session_handler.handle_session(ctx)
+
+
+def create_app(config: AppConfig | None = None) -> AgentServer:
+    """Create and configure the voice agent application.
+
+    Args:
+        config: Application configuration. If None, loads from environment.
+
+    Returns:
+        Configured AgentServer instance ready to run.
     """
+    # Set up server
+    server = AgentServer()
+    server.setup_fnc = _prewarm
+    server.rtc_session()(_handle_session)
 
-    def __init__(self, config: AppConfig | None = None):
-        """Initialize the voice agent application.
+    logger.info("Voice agent application initialized")
 
-        Args:
-            config: Application configuration. If None, loads from environment.
-        """
-        # Load configuration
-        self.config = config or AppConfig()
+    return server
 
-        self.stt = create_stt(self.config.pipeline)
-        self.llm = create_llm(self.config.pipeline)
-        self.tts = create_tts(self.config.pipeline)
 
-        # Create agent
-        self.agent = Assistant(instructions=self.config.agent.instructions)
-
-        # Create session handler with injected dependencies
-        self.session_handler = SessionHandler(
-            stt=self.stt,
-            llm=self.llm,
-            tts=self.tts,
-            agent=self.agent,
-            session_config=self.config.session,
-        )
-
-        # Set up server
-        self.server = AgentServer()
-        self._setup_server()
-
-        logger.info("VoiceAgentApp initialized")
-
-    def _setup_server(self):
-        """Configure the server with prewarm and session handler."""
-        self.server.setup_fnc = self._prewarm
-        self.server.rtc_session()(self.session_handler.handle_session)
-
-    @staticmethod
-    def _prewarm(proc: JobProcess):
-        """Prewarm function for loading VAD model."""
-        proc.userdata["vad"] = silero.VAD.load()
-
-    def run(self):
-        """Run the application."""
-        logger.info("Starting voice agent application")
-        cli.run_app(self.server)
+def download_files():
+    """Download required model files (VAD, turn detector, etc.)."""
+    print("Downloading Silero VAD model...")
+    silero.VAD.load()
+    print("✓ Silero VAD model downloaded")
+    print(
+        "\nNote: Multilingual turn detector will be downloaded automatically on first use "
+        "(requires job context)"
+    )
+    print("\nAll models downloaded successfully!")
 
 
 if __name__ == "__main__":
-    config = AppConfig(
-        pipeline=PipelineConfig(
-            llm_model="mock",
-            enable_keyword_intercept=True,
-        )
-    )
-    app = VoiceAgentApp(config=config)
-    app.run()
+    # Simple CLI: check for download-files command
+    if len(sys.argv) > 1 and sys.argv[1] == "download-files":
+        download_files()
+    else:
+        # Default: start the voice assistant
+        server = create_app()
+        logger.info("Starting voice assistant application")
+        cli.run_app(server)

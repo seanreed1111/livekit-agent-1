@@ -10,7 +10,7 @@ import pytest
 from livekit.agents.llm import ChatContext
 
 # Import will work once we create the module
-# from src.drive_thru_llm import DriveThruLLM
+# from drive_thru_llm import DriveThruLLM
 
 
 # ============================================================================
@@ -33,7 +33,7 @@ def mock_wrapped_llm():
 @pytest.fixture
 def drive_thru_llm(mock_wrapped_llm, test_menu_provider):
     """Create DriveThruLLM with mock LLM and test menu."""
-    from src.drive_thru_llm import DriveThruLLM
+    from drive_thru_llm import DriveThruLLM
 
     return DriveThruLLM(
         wrapped_llm=mock_wrapped_llm,
@@ -45,7 +45,7 @@ def drive_thru_llm(mock_wrapped_llm, test_menu_provider):
 @pytest.fixture
 def drive_thru_llm_real_menu(mock_wrapped_llm, real_menu_provider):
     """Create DriveThruLLM with mock LLM and real menu."""
-    from src.drive_thru_llm import DriveThruLLM
+    from drive_thru_llm import DriveThruLLM
 
     return DriveThruLLM(
         wrapped_llm=mock_wrapped_llm,

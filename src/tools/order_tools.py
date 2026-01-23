@@ -13,9 +13,9 @@ Key Principles:
 from livekit.agents import llm
 from livekit.agents.llm import function_tool
 
-from src.menu_provider import MenuProvider
-from src.menu_validation import validate_order_item
-from src.order_state_manager import OrderStateManager
+from menu_provider import MenuProvider
+from menu_validation import validate_order_item
+from order_state_manager import OrderStateManager
 
 
 def create_order_tools(

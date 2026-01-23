@@ -7,7 +7,7 @@ with OrderStateManager, MenuProvider, and menu_validation.
 
 import pytest
 
-from src.tools.order_tools import create_order_tools
+from tools.order_tools import create_order_tools
 
 # ============================================================================
 # add_item_to_order Tests

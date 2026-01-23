@@ -85,7 +85,7 @@ class DriveThruConfig(BaseModel):
 
     # Menu configuration
     menu_file_path: str = Field(
-        default="menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json",
+        default="src/menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json",
         description="Path to menu JSON file",
     )
 

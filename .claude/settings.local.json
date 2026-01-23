@@ -29,7 +29,15 @@
       "Bash(git commit:*)",
       "Skill(makefile)",
       "Bash(git checkout:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(grep:*)",
+      "Bash(for file in test_*.py)",
+      "Bash(do sed -i '' 's/from src\\\\./from /g' \"$file\")",
+      "Bash(done)",
+      "Bash(make console:*)",
+      "Bash(uv python install:*)",
+      "Bash(uv python pin:*)",
+      "Bash(make dev:*)"
     ]
   }
 }

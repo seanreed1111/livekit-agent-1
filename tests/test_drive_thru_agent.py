@@ -8,17 +8,17 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.drive_thru_agent import DriveThruAgent
-from src.drive_thru_llm import DriveThruLLM
-from src.menu_provider import MenuProvider
-from src.order_state_manager import OrderStateManager
+from drive_thru_agent import DriveThruAgent
+from drive_thru_llm import DriveThruLLM
+from menu_provider import MenuProvider
+from order_state_manager import OrderStateManager
 
 
 @pytest.fixture
 def menu_provider():
     """Real menu provider."""
     return MenuProvider(
-        "menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json"
+        "src/menus/mcdonalds/transformed-data/menu-structure-2026-01-21.json"
     )
 
 

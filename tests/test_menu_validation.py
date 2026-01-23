@@ -10,7 +10,7 @@ Tests cover:
 
 import pytest
 
-from src.menu_validation import (
+from menu_validation import (
     ValidationResult,
     fuzzy_match_item,
     validate_item_exists,

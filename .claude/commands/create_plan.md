@@ -1,6 +1,9 @@
 ---
 description: Create detailed implementation plans through interactive research and iteration
 model: opus
+thinking:
+  type: enabled
+  budget_tokens: 10000
 ---
 
 # Implementation Plan
@@ -27,8 +30,8 @@ Please provide:
 
 I'll analyze this information and work with you to create a comprehensive plan.
 
-Tip: You can also invoke this command with a ticket file directly: `/create_plan thoughts/allison/tickets/eng_1234.md`
-For deeper analysis, try: `/create_plan think deeply about thoughts/allison/tickets/eng_1234.md`
+Tip: You can also invoke this command with a ticket file directly: `/create_plan docs/tickets/eng_1234.md`
+For deeper analysis, try: `/create_plan think deeply about docs/tickets/eng_1234.md`
 ```
 
 Then wait for the user's input.
@@ -38,7 +41,7 @@ Then wait for the user's input.
 ### Step 1: Context Gathering & Initial Analysis
 
 1. **Read all mentioned files immediately and FULLY**:
-   - Ticket files (e.g., `thoughts/allison/tickets/eng_1234.md`)
+   - Ticket files (e.g., `docs/tickets/eng_1234.md`)
    - Research documents
    - Related implementation plans
    - Any JSON/data files mentioned
@@ -56,7 +59,7 @@ Then wait for the user's input.
 
    These agents will:
    - Find relevant source files, configs, and tests
-   - Identify the specific directories to focus on (e.g., if WUI is mentioned, they'll focus on humanlayer-wui/)
+   - Identify the specific directories to focus on based on the task
    - Trace data flow and key functions
    - Return detailed explanations with file:line references
 
@@ -167,37 +170,117 @@ Once aligned on approach:
 
 ### Step 4: Detailed Plan Writing
 
+## Task Organization Principles
+
+Plans should organize work into **phases grouped by subsystem** to enable parallel execution.
+
+### Grouping Strategy
+
+During execution, tasks are **grouped by subsystem** to share agent context. Structure your plan to make grouping clear:
+
+- Tasks under the same phase heading touching the same subsystem → run in one agent
+- Phases touching different subsystems → can run in parallel
+- Max 3-4 tasks per phase (split larger sections)
+
+Example structure:
+```markdown
+## Phase 1: Authentication (no dependencies)
+### Task 1.1: Add login
+### Task 1.2: Add logout
+
+## Phase 2: Billing (depends on Phase 1)
+### Task 2.1: Add billing API
+### Task 2.2: Add webhooks
+
+## Phase 3: Integration (depends on Phases 1 & 2)
+### Task 3.1: Wire auth + billing
+```
+
+### Task Sizing
+
+A task includes **everything** to complete one logical unit:
+- Implementation + tests + types + exports
+- All steps a single agent should do together
+
+**Right-sized:** "Add user authentication" - one agent does model, service, tests, types
+**Wrong:** Separate tasks for model, service, tests - these should be one task
+
+**Bundle trivial items:** Group small related changes (add export, update config, rename) into one task.
+
+### Context Loading
+
+Each phase should specify which files need to be read before starting work:
+
+```markdown
+## Phase 1: Authentication
+
+### Context
+Before starting, read these files:
+- `src/auth/` - existing authentication code
+- `tests/auth/` - existing test patterns
+- `src/config.ts` - configuration structure
+```
+
+This ensures agents have the necessary context loaded before making changes.
+
 After structure approval:
 
-1. **Write the plan** to `thoughts/shared/plans/YYYY-MM-DD-ENG-XXXX-description.md`
-   - Format: `YYYY-MM-DD-ENG-XXXX-description.md` where:
+1. **Write the plan** to `plan/YYYY-MM-DD-<feature-name>.md`
+   - Format: `YYYY-MM-DD-<feature-name>.md` where:
      - YYYY-MM-DD is today's date
-     - ENG-XXXX is the ticket number (omit if no ticket)
-     - description is a brief kebab-case description
+     - feature-name is a brief kebab-case description
+     - Optional: Include ticket reference like `YYYY-MM-DD-ENG-XXXX-description.md`
    - Examples:
+     - `2025-01-08-parent-child-tracking.md`
      - With ticket: `2025-01-08-ENG-1478-parent-child-tracking.md`
-     - Without ticket: `2025-01-08-improve-error-handling.md`
 2. **Use this template structure**:
 
+### Standard Template (Single File)
+
+Use this for plans under 400 lines:
+
 ````markdown
-# [Feature/Task Name] Implementation Plan
+# [Feature Name] Implementation Plan
+
+> **Status:** DRAFT | APPROVED | IN_PROGRESS | COMPLETED
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Current State Analysis](#current-state-analysis)
+- [Desired End State](#desired-end-state)
+- [What We're NOT Doing](#what-were-not-doing)
+- [Implementation Approach](#implementation-approach)
+- [Dependencies](#dependencies)
+- [Phase 1: Descriptive Name](#phase-1-descriptive-name)
+- [Phase 2: Descriptive Name](#phase-2-descriptive-name)
+- [Testing Strategy](#testing-strategy)
+- [References](#references)
 
 ## Overview
 
-[Brief description of what we're implementing and why]
+[Brief 2-3 paragraph description of what we're implementing and why]
 
 ## Current State Analysis
 
 [What exists now, what's missing, key constraints discovered]
 
-## Desired End State
-
-[A Specification of the desired end state after this plan is complete, and how to verify it]
-
 ### Key Discoveries:
 - [Important finding with file:line reference]
 - [Pattern to follow]
 - [Constraint to work within]
+
+## Desired End State
+
+[A Specification of the desired end state after this plan is complete]
+
+**Success Criteria:**
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+**How to Verify:**
+- [Specific commands or steps to verify completion]
 
 ## What We're NOT Doing
 
@@ -207,22 +290,64 @@ After structure approval:
 
 [High-level strategy and reasoning]
 
+## Dependencies
+
+**Execution Order:**
+
+1. Phase 1 (no dependencies)
+2. Phase 2 (depends on Phase 1)
+3. Phase 3 (depends on Phases 1 & 2)
+
+**Dependency Graph:**
+
+```
+Phase 1 (Authentication)
+  ├─> Phase 2 (Billing - needs auth)
+  └─> Phase 3 (Integration - needs both)
+```
+
+**Parallelization:**
+- Phases 1 and 4 can run in parallel (independent subsystems)
+- Phase 2 must wait for Phase 1
+- Phase 3 must wait for Phases 1 and 2
+
+---
+
 ## Phase 1: [Descriptive Name]
 
 ### Overview
 [What this phase accomplishes]
 
-### Changes Required:
+### Context
+Before starting, read these files:
+- `src/relevant/file.ts` - [why this file is relevant]
+- `tests/relevant/` - [existing test patterns]
 
-#### 1. [Component/File Group]
-**File**: `path/to/file.ext`
-**Changes**: [Summary of changes]
+### Dependencies
+**Depends on:** None
+**Required by:** Phase 2, Phase 3
+
+### Changes Required
+
+#### 1.1: [Component/File Group]
+**File:** `path/to/file.ext`
+
+**Changes:**
+[Summary of changes]
 
 ```[language]
 // Specific code to add/modify
 ```
 
-### Success Criteria:
+**Rationale:** [Why this change is needed]
+
+#### 1.2: [Another Component]
+**File:** `path/to/another.ext`
+
+**Changes:**
+[Summary of changes]
+
+### Success Criteria
 
 #### Automated Verification:
 - [ ] Migration applies cleanly: `make migrate`
@@ -237,13 +362,34 @@ After structure approval:
 - [ ] Edge case handling verified manually
 - [ ] No regressions in related features
 
-**Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase.
+**Verify:** After completing automated verification, pause for manual confirmation before proceeding.
 
 ---
 
 ## Phase 2: [Descriptive Name]
 
-[Similar structure with both automated and manual success criteria...]
+### Overview
+[What this phase accomplishes]
+
+### Context
+Before starting, read these files:
+- [Files to read]
+
+### Dependencies
+**Depends on:** Phase 1
+**Required by:** Phase 3
+
+### Changes Required
+
+[Similar structure as Phase 1...]
+
+### Success Criteria
+
+#### Automated Verification:
+[Automated checks...]
+
+#### Manual Verification:
+[Manual testing steps...]
 
 ---
 
@@ -271,37 +417,180 @@ After structure approval:
 
 ## References
 
-- Original ticket: `thoughts/allison/tickets/eng_XXXX.md`
-- Related research: `thoughts/shared/research/[relevant].md`
+- Original ticket: `[path/to/ticket.md]` (if applicable)
+- Related research: `[path/to/research.md]` (if applicable)
 - Similar implementation: `[file:line]`
+- Dependencies: `[external libraries or services]`
 ````
 
-### Step 5: Sync and Review
+### Large Plan Template (Multi-File)
 
-1. **Sync the thoughts directory**:
-   - Run `humanlayer thoughts sync` to sync the newly created plan
-   - This ensures the plan is properly indexed and available
+For plans over 400 lines, split into separate files in a directory:
 
-2. **Present the draft plan location**:
+**Directory Structure:**
+```
+plan/YYYY-MM-DD-feature-name/
+├── README.md                    # Overview, dependencies, checklist
+├── 01-authentication.md         # First phase
+├── 02-billing.md                # Second phase
+└── 03-integration.md            # Third phase
+```
+
+**Main README.md:**
+````markdown
+# [Feature Name] Implementation Plan
+
+> **Status:** DRAFT | APPROVED | IN_PROGRESS | COMPLETED
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Dependencies](#dependencies)
+- [Task Checklist](#task-checklist)
+- [Phase Files](#phase-files)
+
+## Overview
+
+[Brief 2-3 paragraph summary of what we're building and why]
+
+## Current State Analysis
+
+[What exists now, what's missing, key constraints]
+
+## Desired End State
+
+[Specification of desired end state]
+
+**Success Criteria:**
+- [ ] Overall criterion 1
+- [ ] Overall criterion 2
+
+## What We're NOT Doing
+
+[Out-of-scope items]
+
+## Dependencies
+
+**Execution Order:**
+
+1. [Phase 1: Authentication](./01-authentication.md) (no dependencies)
+2. [Phase 2: Billing](./02-billing.md) (depends on Phase 1)
+3. [Phase 3: Integration](./03-integration.md) (depends on Phases 1 & 2)
+
+**Dependency Graph:**
+
+```
+01-authentication.md
+  ├─> 02-billing.md
+  └─> 03-integration.md
+```
+
+**Parallelization:**
+- Phases 1 and 4 can run in parallel (independent subsystems)
+- Phase 2 must wait for Phase 1
+
+## Task Checklist
+
+- [ ] [Phase 1: Authentication](./01-authentication.md)
+- [ ] [Phase 2: Billing](./02-billing.md)
+- [ ] [Phase 3: Integration](./03-integration.md)
+
+## Phase Files
+
+1. [Authentication](./01-authentication.md)
+2. [Billing](./02-billing.md)
+3. [Integration](./03-integration.md)
+
+## References
+
+[Links to tickets, research, etc.]
+````
+
+**Individual Phase File (e.g., 01-authentication.md):**
+````markdown
+# Phase 1: Authentication
+
+← [Back to Main Plan](./README.md)
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Context](#context)
+- [Dependencies](#dependencies)
+- [Changes Required](#changes-required)
+- [Success Criteria](#success-criteria)
+
+## Overview
+
+[Brief description of this phase]
+
+## Context
+
+Before starting, read these files:
+- `src/auth/` - existing authentication code
+- `tests/auth/` - existing test patterns
+
+## Dependencies
+
+**Depends on:** None
+
+**Required by:**
+- [Phase 2: Billing](./02-billing.md)
+- [Phase 3: Integration](./03-integration.md)
+
+## Changes Required
+
+### 1.1: Add Login Logic
+**File:** `src/auth/login.ts`
+
+**Changes:**
+[Detailed changes...]
+
+### 1.2: Add Tests
+**File:** `tests/auth/login.test.ts`
+
+**Changes:**
+[Test implementation...]
+
+## Success Criteria
+
+### Automated Verification:
+- [ ] Tests pass: `npm test -- tests/auth/`
+- [ ] Type check passes: `npm run typecheck`
+
+### Manual Verification:
+- [ ] Login flow works in UI
+- [ ] Error handling is user-friendly
+
+---
+
+← [Back to Main Plan](./README.md)
+````
+
+### Step 5: Present and Review
+
+1. **Present the draft plan location**:
    ```
    I've created the initial implementation plan at:
-   `thoughts/shared/plans/YYYY-MM-DD-ENG-XXXX-description.md`
+   `plan/YYYY-MM-DD-<feature-name>.md`
 
    Please review it and let me know:
-   - Are the phases properly scoped?
-   - Are the success criteria specific enough?
+   - Are the phases properly scoped and grouped by subsystem?
+   - Can any phases be parallelized?
+   - Are the success criteria specific enough (both automated and manual)?
+   - Is the context loading clear for each phase?
    - Any technical details that need adjustment?
    - Missing edge cases or considerations?
    ```
 
-3. **Iterate based on feedback** - be ready to:
+2. **Iterate based on feedback** - be ready to:
    - Add missing phases
-   - Adjust technical approach
+   - Adjust task grouping and parallelization
    - Clarify success criteria (both automated and manual)
    - Add/remove scope items
-   - After making changes, run `humanlayer thoughts sync` again
+   - Refine context loading sections
 
-4. **Continue refining** until the user is satisfied
+3. **Continue refining** until the user is satisfied
 
 ## Important Guidelines
 
@@ -322,7 +611,10 @@ After structure approval:
    - Research actual code patterns using parallel sub-tasks
    - Include specific file paths and line numbers
    - Write measurable success criteria with clear automated vs manual distinction
-   - automated steps should use `make` whenever possible - for example `make -C humanlayer-wui check` instead of `cd humanlayer-wui && bun run fmt`
+   - Automated steps should use `make` whenever possible
+   - Identify subsystem boundaries for task grouping and parallelization
+   - Document context loading needs for each phase
+   - Bundle trivial changes together (don't create separate tasks for small related changes)
 
 4. **Be Practical**:
    - Focus on incremental, testable changes
@@ -375,6 +667,26 @@ After structure approval:
 - [ ] Feature works correctly on mobile devices
 ```
 
+## Planning Rules
+
+When creating plans, follow these rules:
+
+1. **Table of contents required**: Every plan must start with a linked table of contents
+2. **Document dependencies**: Every plan must have a Dependencies section showing:
+   - Execution order (which phases must run first)
+   - Dependency graph (which phases depend on which other phases)
+   - Parallelization opportunities (which phases can run simultaneously)
+3. **Phase dependencies**: Each phase must specify what it depends on and what depends on it
+4. **Explicit paths**: Use exact file paths - say "create `src/utils/helpers.ts`" not "create a utility"
+5. **Context per phase**: List files to read before starting each phase
+6. **Verify every phase**: End with both automated AND manual success criteria
+7. **One agent per task**: All steps within a task are handled by the same agent
+8. **Split large plans**: Plans over 400 lines → split into multiple files in a directory with bidirectional links
+9. **Status tracking**: Include status badge at top (DRAFT/APPROVED/IN_PROGRESS/COMPLETED)
+10. **No open questions**: Resolve all questions before finalizing plan - research or ask for clarification immediately
+11. **Bundle trivial changes**: Group small related changes (add export, update config, rename) into one task
+12. **Task grouping**: Group tasks by subsystem to enable parallel execution and context sharing
+
 ## Common Patterns
 
 ### For Database Changes:
@@ -409,10 +721,10 @@ When spawning research sub-tasks:
    - What information to extract
    - Expected output format
 4. **Be EXTREMELY specific about directories**:
-   - If the ticket mentions "WUI", specify `humanlayer-wui/` directory
-   - If it mentions "daemon", specify `hld/` directory
-   - Never use generic terms like "UI" when you mean "WUI"
+   - Use exact directory paths from the ticket or task description
+   - Don't use generic terms - be specific about which component/module
    - Include the full path context in your prompts
+   - Verify directory names match the actual codebase structure
 5. **Specify read-only tools** to use
 6. **Request specific file:line references** in responses
 7. **Wait for all tasks to complete** before synthesizing
@@ -438,12 +750,12 @@ tasks = [
 User: /create_plan
 Assistant: I'll help you create a detailed implementation plan...
 
-User: We need to add parent-child tracking for Claude sub-tasks. See thoughts/allison/tickets/eng_1478.md
+User: We need to add user authentication. See docs/tickets/auth-feature.md
 Assistant: Let me read that ticket file completely first...
 
 [Reads file fully]
 
-Based on the ticket, I understand we need to track parent-child relationships for Claude sub-task events in the hld daemon. Before I start planning, I have some questions...
+Based on the ticket, I understand we need to implement user authentication with login/logout functionality. Before I start planning, I have some questions...
 
 [Interactive process continues...]
 ```
