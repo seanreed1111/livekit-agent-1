@@ -1,5 +1,76 @@
 # Changelog
 
+## PR #15: Critical Test Coverage Implementation (January 24, 2026)
+
+**Commit:** c09469f
+**Branch:** `implement-critical-tests`
+**Files changed:** 4 files (+1,298 lines)
+
+### ✨ New Features
+
+#### Comprehensive Test Suite for Core Components
+- **Configuration Tests** (`tests/test_config.py`) - 3 critical tests
+  - Environment variable loading from `.env.local` files
+  - Nested delimiter support for hierarchical config (`PIPELINE__LLM_MODEL`)
+  - Default value handling when environment variables not set
+  - Proper test isolation using `monkeypatch.delenv()` to prevent environment interference
+
+- **Factory Tests** (`tests/test_factories.py`) - 6 critical tests
+  - Normal LLM creation with OpenAI models
+  - Mock LLM creation for testing without API calls
+  - Keyword interceptor wrapping (both mock and real LLM)
+  - STT creation with configuration parameters
+  - TTS creation with configuration parameters
+  - Uses `unittest.mock.patch` to avoid API key requirements
+
+- **Session Handler Tests** (`tests/test_session_handler.py`) - 4 critical tests
+  - Dependency injection storage verification
+  - AgentSession creation with correct components
+  - Room connection lifecycle management
+  - Initial greeting message delivery
+  - Async testing with proper pytest-asyncio configuration
+
+### 📊 Test Coverage Report
+- **Test Coverage Review** (`plan/review-tests/2026-01-24-165019-test-coverage-review.md`)
+  - Comprehensive analysis of existing test coverage (~25% before)
+  - Identified 31 missing tests categorized by criticality
+  - Detailed test specifications for each gap
+  - Priority recommendations for implementation
+
+### 🔧 Technical Improvements
+
+#### Test Infrastructure
+- **Mocking Strategy** - Isolated unit tests that don't require external services
+  - Mocked LiveKit `inference.LLM`, `inference.STT`, `inference.TTS` components
+  - Mocked `MultilingualModel` to avoid job context requirements
+  - Mocked `AgentSession` for session handler tests
+
+- **Environment Isolation** - Reliable CI/CD test execution
+  - Fixed environment variable interference from project `.env.local`
+  - Used `monkeypatch.delenv()` to clear env vars before each test
+  - Tests now pass consistently in both individual and full suite runs
+
+#### Test Results
+```
+27 passed in 6.29s
+```
+- 13 new critical tests (all passing)
+- 14 existing tests (all passing)
+- Zero flaky tests
+- Proper async test handling
+
+### 📝 Documentation
+
+#### Test Coverage Review Process
+- Analyzed 6 source files and 3 existing test files
+- Generated detailed gap analysis with 31 missing tests:
+  - 10 critical priority tests (now implemented)
+  - 9 high priority tests
+  - 8 medium priority tests
+  - 4 low priority tests
+
+---
+
 ## PR #14: Production Refactoring Command with Farley-Beck Principles (January 24, 2026)
 
 **Commit:** 4b7f64e
