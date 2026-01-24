@@ -1,5 +1,307 @@
 # Changelog
 
+## PR #14: Production Refactoring Command with Farley-Beck Principles (January 24, 2026)
+
+**Commit:** 4b7f64e
+**Branch:** `add-refactor-production-command`
+**Files changed:** 4 files (+2,197 lines, -3 lines)
+
+### ✨ New Features
+
+#### `/refactor-production` Command
+- **Comprehensive production refactoring system** - Applies Dave Farley's Continuous Delivery and Kent Beck's preparatory refactoring principles
+  - Research-driven approach: Searches web for latest Farley-Beck refactoring patterns before analyzing code
+  - Multi-stage workflow with explicit user approval gates at critical decision points
+  - Test-first methodology: Ensures ≥80% test coverage before any refactoring begins
+  - Small, incremental changes following Kent Beck's "tidyings" philosophy (minutes to hours, not days)
+  - Complete safety measures: tests after each change, clear rollback plans at each phase
+  - Implemented in `.claude/commands/refactor-production.md` (1,337 lines)
+
+#### Refactoring Workflow (11 Phases)
+1. **Research Phase** - Web search for latest Farley-Beck patterns
+   - Searches for Dave Farley's Modern Software Engineering patterns (2026)
+   - Searches for Kent Beck's "Tidy First?" preparatory refactoring (2023)
+   - Documents findings with sources in `plan/future-plans/refactoring-research-YYYY-MM-DD.md`
+
+2. **Codebase Analysis** - Identifies code smells and architectural issues
+   - Long methods/functions (>50 lines)
+   - Deep nesting (>3 levels)
+   - Duplicated code and God objects
+   - Feature envy and primitive obsession
+   - Missing or overly-complex abstractions
+   - Results documented in detailed analysis section
+
+3. **Initial Plan Creation** - Generates detailed, executable refactoring plan
+   - Phase-based approach: Preparatory → Structural → Patterns → Validation
+   - Each step includes: verification method, success criteria, rollback plan
+   - Code examples showing before/after transformations
+   - Saved to `plan/future-plans/refactoring-[scope]-YYYY-MM-DD.md`
+
+4. **Plan Review** - Sub-agent reviews plan for correctness and completeness
+   - Checks adherence to Farley-Beck principles
+   - Validates technical correctness and safety measures
+   - Identifies critical issues, major concerns, minor improvements
+   - Feedback saved to `plan/future-plans/refactoring-[scope]-YYYY-MM-DD-SUBAGENT-FEEDBACK.md`
+
+5. **Feedback Incorporation** - Addresses review feedback
+   - Resolves all critical issues
+   - Addresses major concerns appropriately
+   - Documents revision history with specific changes
+   - Final plan saved to `plan/future-plans/refactoring-[scope]-YYYY-MM-DD-AFTER_FEEDBACK.md`
+
+6. **Test Coverage Review** - Uses `/review-tests` command to analyze existing tests
+   - Identifies gaps in unit, integration, and edge case coverage
+   - Calculates coverage percentage for refactoring targets
+   - Determines if coverage is sufficient (≥80%) for safe refactoring
+   - Report saved to `plan/review-tests/YYYY-MM-DD-HHMMSS-test-coverage-review[-scope].md`
+
+7. **Coverage Decision Point** - STOPS if test coverage insufficient
+   - Presents test gap analysis to user
+   - Explains risks of refactoring without adequate tests
+   - Offers options: write tests first (TDD), review gaps, or skip tests (not recommended)
+   - Requires explicit user approval to proceed
+
+8. **Test Writing** - Spawns test-writing agent if coverage insufficient
+   - Follows TDD principles: write tests before refactoring
+   - Targets ≥80% coverage for all refactoring targets
+   - Uses writing-tests skill with comprehensive specifications
+   - Verifies tests pass and coverage goals met
+
+9. **Refactoring Approval** - Gets explicit user approval before executing
+   - Presents complete refactoring summary with metrics
+   - Shows benefits, risks, estimated duration
+   - Lists all safety measures in place
+   - Requires explicit "Yes, proceed" from user
+
+10. **Plan Execution** - Executes refactoring in small, verified steps
+    - Runs tests after EACH tidying (abort if any fail)
+    - Creates git commit after each phase completion
+    - Logs all actions, test results, and deviations
+    - Execution log saved to `plan/future-plans/refactoring-[scope]-YYYY-MM-DD-EXECUTION.md`
+
+11. **Final Report** - Comprehensive completion summary
+    - Success criteria validation
+    - Before/after metrics (coverage, complexity, code smells)
+    - List of all artifacts created
+    - List of files modified and commits made
+    - Next steps for code review and deployment
+
+#### Core Principles Implementation
+
+**Dave Farley (Continuous Delivery):**
+- Small, incremental changes that can be validated independently
+- Evidence-based decisions through automated tests
+- Continuous integration: every commit must pass all tests
+- Focus on production quality and deployability
+- Automation-first approach to verification
+
+**Kent Beck ("Tidy First?" & TDD):**
+- "Make the change easy, then make the easy change" - preparatory refactoring first
+- Tidyings are small (minutes to hours, not days or weeks)
+- Separate structural changes from behavioral changes
+- Test-driven: write tests before refactoring code
+- YAGNI: don't add features or abstractions for hypothetical futures
+- Simple design that grows organically, one decision at a time
+
+#### Common Refactoring Patterns
+
+**Kent Beck's Tidyings (from "Tidy First?" 2023):**
+- Guard clauses - Early returns for error conditions
+- Dead code elimination - Remove unused code
+- Normalize symmetries - Make similar code look similar
+- Explicit parameters - Replace magic values with parameters
+- Chunk statements - Group related lines together
+- Extract helper - Pull out helper functions
+- Explaining constants - Named constants instead of literals
+- Explaining variables - Intermediate variables with clear names
+
+**Dave Farley's Patterns (from Modern Software Engineering):**
+- Modularity - Strong cohesion, loose coupling
+- Separation of concerns - Each module has one responsibility
+- Information hiding - Encapsulate implementation details
+- Testability - Design for automated testing
+- Deployability - Small, incremental, reversible changes
+
+#### Safety Features
+
+**Never Refactor Without Tests:**
+- STOPS immediately if test coverage <80%
+- Offers to write tests first (TDD approach)
+- Requires explicit user approval to skip tests (with strong warnings)
+- Documents risk level at every stage
+
+**Small, Incremental Steps:**
+- Each "tidying" takes minutes to hours, never days
+- Tests run after every single change
+- Code must be in working state after each step
+- Clear rollback plan at every phase
+
+**Complete Execution Tracking:**
+- Logs every step with timestamps
+- Records all test results (pass/fail, coverage %)
+- Documents any deviations from plan
+- Saves comprehensive execution log
+
+**User Control:**
+- Explicit approval required before writing tests
+- Explicit approval required before executing refactoring
+- STOPS and asks user if unexpected issues arise
+- Never proceeds automatically when safety is uncertain
+
+#### `/review-tests` Command
+- **Comprehensive test coverage analysis** - Identifies gaps and missing tests for any source file or directory
+  - Analyzes existing test suite to map coverage systematically
+  - Discovers which tests cover which source code (if any)
+  - Identifies what functionality is tested vs. not tested
+  - Categorizes missing tests by criticality (Critical/High/Medium/Low)
+  - Groups gaps by functionality (config, business logic, integration, errors, edge cases)
+  - Organizes by test type (unit, integration, end-to-end)
+  - Generates detailed test specifications for each missing test
+  - Implemented in `.claude/commands/review-tests.md` (670 lines)
+
+#### Test Review Features
+
+**Flexible Scope:**
+- `/review-tests` - Review all source files (full review)
+- `/review-tests src/config.py` - Review specific file
+- `/review-tests src/config.py src/factories.py` - Review multiple files
+- `/review-tests src/adapters` - Review entire directory
+
+**Comprehensive Analysis:**
+- **Coverage mapping** - Which tests cover which source files
+- **Gap identification** - What functionality lacks tests
+- **Quality assessment** - Are tests well-organized, isolated, following best practices?
+- **Criticality categorization** - Which gaps are production blockers vs. nice-to-have
+
+**Detailed Report Output:**
+- Executive summary with overall coverage percentage
+- Per-file coverage analysis with critical gaps
+- Missing tests organized by criticality (Critical/High/Medium/Low)
+- Missing tests organized by functionality (config, business logic, etc.)
+- Missing tests organized by type (unit, integration, e2e)
+- Test quality assessment with strengths and weaknesses
+- Implementation plan with phases and effort estimates
+- Appendix with detailed test specifications
+- Report saved to `plan/review-tests/YYYY-MM-DD-HHMMSS-test-coverage-review[-scope].md`
+
+**Integration with Refactoring:**
+- Used automatically in Phase 6 of `/refactor-production` workflow
+- Determines if test coverage is sufficient for safe refactoring
+- Provides detailed specifications for writing missing tests
+- Ensures refactoring never proceeds without adequate test protection
+
+### 🔧 Improvements
+
+#### AGENTS.md Updates
+- **Added frontmatter** - Enabled `alwaysApply: true` setting
+  - Makes AGENTS.md instructions available to all agent sessions
+  - Ensures consistent coding guidelines across sessions
+  - Better integration with Claude Code's agent system
+
+### ⚙️ Configuration
+
+#### Settings Updates
+- **Enhanced bash permissions** - `.claude/settings.local.json`
+  - Added `Bash(gh pr merge:*)` for PR merging capability
+  - Added `Bash(git pull:*)` for pulling remote changes
+  - Added `Bash(git push:*)` for pushing to remote
+  - Enables more automated git workflows
+
+### 📚 Documentation
+
+#### Refactoring Philosophy
+The `/refactor-production` command embodies the principle:
+
+> **"First make the change easy (warning: this might be hard), then make the easy change."**
+> — Kent Beck
+
+This approach prioritizes preparatory refactoring (tidyings) before making actual changes, resulting in safer, more maintainable code.
+
+#### Example Workflow
+
+```bash
+# User runs refactoring command
+/refactor-production src/config.py
+
+# System executes 11-phase workflow:
+# 1. Research → Finds latest Farley-Beck patterns
+# 2. Analyze → Identifies 5 code smells, 2 architectural issues
+# 3. Plan → Creates detailed refactoring plan (3 phases)
+# 4. Review → Sub-agent finds 2 critical issues, provides feedback
+# 5. Revise → Incorporates feedback, improves plan
+# 6. Test Coverage → Discovers only 15% coverage (needs 80%+)
+# 7. STOP → Asks user: "Coverage insufficient, write tests first?"
+# User: "Yes, write tests first"
+# 8. Write Tests → Adds 13 tests, coverage now 85%
+# 9. Approval → Asks user: "Ready to refactor, proceed?"
+# User: "Yes, proceed"
+# 10. Execute → Runs 3 phases with tests after each step
+# 11. Report → All tests passing, coverage 92%, ready for production
+```
+
+#### Artifacts Generated
+
+For each refactoring session:
+1. `refactoring-research-YYYY-MM-DD.md` - Research findings with sources
+2. `refactoring-[scope]-YYYY-MM-DD.md` - Initial plan
+3. `refactoring-[scope]-YYYY-MM-DD-SUBAGENT-FEEDBACK.md` - Review feedback
+4. `refactoring-[scope]-YYYY-MM-DD-AFTER_FEEDBACK.md` - Final plan
+5. `YYYY-MM-DD-HHMMSS-test-coverage-review[-scope].md` - Test coverage analysis
+6. `refactoring-[scope]-YYYY-MM-DD-EXECUTION.md` - Execution log with metrics
+
+### Files Modified
+
+#### Commands (2 files, +2,007 lines)
+- `.claude/commands/refactor-production.md` - Production refactoring command (1,337 lines)
+- `.claude/commands/review-tests.md` - Test coverage review command (670 lines)
+
+#### Configuration (1 file, +6 lines)
+- `.claude/settings.local.json` - Added git merge/pull/push permissions
+
+#### Documentation (1 file, +3 lines)
+- `AGENTS.md` - Added frontmatter with alwaysApply setting
+
+### Files Added
+
+#### Plan Directory (1 directory)
+- `plan/future-plans/` - Storage for refactoring plans and research
+
+### Migration Notes
+
+This release introduces a production-grade refactoring system that prioritizes safety, testing, and user control:
+
+#### Key Benefits
+- **Prevents regressions** - Never refactors without ≥80% test coverage
+- **Evidence-based** - Every change validated by automated tests
+- **User control** - Explicit approval required at critical decision points
+- **Small steps** - Kent Beck's tidyings minimize risk per change
+- **Complete documentation** - Detailed plans and execution logs
+- **Research-driven** - Applies latest patterns from industry thought leaders
+
+#### When to Use
+- Before adding new features to legacy code (make the change easy first)
+- When code smells accumulate and hurt productivity
+- To improve testability before writing tests
+- To reduce technical debt incrementally
+- When preparing code for major architectural changes
+
+#### Design Philosophy
+- Test coverage is non-negotiable for safe refactoring
+- Small, incremental changes are safer than large rewrites
+- Preparatory refactoring makes subsequent changes easier
+- User approval ensures alignment before major work begins
+- Complete documentation enables future agents to understand decisions
+
+The refactoring system brings world-class software engineering practices to AI-assisted development, following the principles of Dave Farley (Continuous Delivery) and Kent Beck (TDD, Extreme Programming, "Tidy First?").
+
+#### Research Sources
+- [Dave Farley's Modern Software Engineering](https://www.davefarley.net/)
+- [Kent Beck's "Tidy First?" (2023)](https://www.oreilly.com/library/view/tidy-first/9781098151232/)
+- [Martin Fowler on Preparatory Refactoring](https://martinfowler.com/articles/preparatory-refactoring-example.html)
+- [Kent Beck's Original Quote](https://twitter.com/KentBeck/status/250733358307500032)
+
+---
+
 ## PR #13: Project Organization and Documentation Cleanup (January 24, 2026)
 
 **Commit:** 90fed77
