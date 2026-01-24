@@ -1,5 +1,79 @@
 # Changelog
 
+## PR #13: Project Organization and Documentation Cleanup (January 24, 2026)
+
+**Commit:** 90fed77
+**Branch:** `update-makefile`
+**Files changed:** 6 files
+
+### 🔧 Improvements
+
+#### Development Experience
+- **Improved default run mode** - Makefile now uses `console` mode by default for better interactive development
+  - Updated `make run` to execute `uv run python src/app.py console`
+  - Console mode provides direct terminal interaction without LiveKit Cloud connection requirements
+  - Better for local testing and debugging
+
+#### Documentation Cleanup
+- **Streamlined CLI tool references** - Removed outdated MCP installation instructions
+  - Removed Codex CLI installation section (tool no longer maintained)
+  - Removed Gemini CLI installation section
+  - Kept Cursor and Claude Code instructions which are actively supported
+  - Cleaner README focused on current, supported tools
+
+### ⚙️ Configuration
+
+#### Git Repository Organization
+- **Plan directory now tracked** - Updated `.gitignore` to include plan files in version control
+  - Removed `.cursor/orders/` exclusion (no longer needed)
+  - Removed `plan/` exclusion to track implementation plans and reviews
+  - Ensures planning documentation is preserved across sessions
+
+### 📚 Documentation
+
+#### Plan Organization
+- **Completed plans archived** - Moved finished implementation plans to organized structure
+  - Created `plan/completed-plans/remove-mcdonalds-voice-agent/` directory
+  - Moved `remove-mcdonalds-voice-agent.md` and review file to completed plans
+  - Added `review-plan-command.md` to completed plans directory
+  - Cleaner separation between active and completed work
+
+### Files Modified
+
+#### Build System (1 file)
+- `Makefile` - Changed default run mode to `console`
+
+#### Documentation (1 file)
+- `README.md` - Removed outdated CLI tool installation instructions (-11 lines)
+
+#### Configuration (1 file)
+- `.gitignore` - Removed plan directory exclusion to track plans
+
+#### Plan Organization (3 files moved)
+- `plan/completed-plans/remove-mcdonalds-voice-agent/remove-mcdonalds-voice-agent.md`
+- `plan/completed-plans/remove-mcdonalds-voice-agent/remove-mcdonalds-voice-agent.REVIEW.md`
+- `plan/completed-plans/review-plan-command/review-plan-command.md`
+
+### Migration Notes
+
+This release focuses on improving developer experience and project organization:
+
+#### Key Benefits
+- **Faster local development** - Console mode by default means fewer dependencies for basic testing
+- **Cleaner documentation** - Removed references to deprecated tools
+- **Better plan tracking** - Implementation plans now preserved in version control
+- **Organized history** - Completed plans separated from active work
+
+#### Design Philosophy
+- Optimize for the most common use case (local development with console mode)
+- Remove documentation for tools that are no longer actively maintained
+- Track planning artifacts as first-class project documentation
+- Maintain clear separation between active and completed work
+
+The changes support better developer onboarding and long-term project maintainability.
+
+---
+
 ## [2.0.0] - 2026-01-23
 
 ### BREAKING CHANGES
