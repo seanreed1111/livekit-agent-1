@@ -23,7 +23,7 @@ help:
 
 run:
 	@echo "$(BLUE)Starting voice assistant...$(NC)"
-	uv run python src/app.py
+	uv run python src/app.py console
 
 setup:
 	@echo "$(BLUE)Installing dependencies...$(NC)"

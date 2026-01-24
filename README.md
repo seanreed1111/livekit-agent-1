@@ -305,17 +305,6 @@ Install the [LiveKit Docs MCP server](https://docs.livekit.io/mcp) for best resu
 claude mcp add --transport http livekit-docs https://docs.livekit.io/mcp
 ```
 
-**For Codex CLI:**
-
-```bash
-codex mcp add --url https://docs.livekit.io/mcp livekit-docs
-```
-
-**For Gemini CLI:**
-
-```bash
-gemini mcp add --transport http livekit-docs https://docs.livekit.io/mcp
-```
 
 The project includes a complete [AGENTS.md](AGENTS.md) file with coding guidelines. See [https://agents.md](https://agents.md) to learn more.
 
