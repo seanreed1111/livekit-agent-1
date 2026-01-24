@@ -41,7 +41,10 @@
       "Skill(review_plan)",
       "Bash(uv lock:*)",
       "Bash(uv tree:*)",
-      "Bash(docker build:*)"
+      "Bash(docker build:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(git pull:*)",
+      "Bash(git push:*)"
     ]
   }
 }

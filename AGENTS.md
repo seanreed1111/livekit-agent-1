@@ -1,3 +1,8 @@
+---
+description: 
+alwaysApply: true
+---
+
 # AGENTS.md
 
 This is a LiveKit Agents project. LiveKit Agents is a Python SDK for building voice AI agents. This project is intended to be used with LiveKit Cloud. See @README.md for more about the rest of the LiveKit ecosystem.
@@ -359,5 +364,3 @@ src/
 ## LiveKit CLI
 
 You can make use of the LiveKit CLI (`lk`) for various tasks, with user approval.
-
-
