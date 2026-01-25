@@ -12,7 +12,12 @@ This style guide is based on [Common Changelog](https://common-changelog.org/) w
 
 ## File Structure
 
-**Filename:** `CHANGELOG.md`
+**Directory:** `docs/changelog/`
+
+**Filename Format:** `CHANGELOG-YYYY-MM-DD.md` (e.g., `CHANGELOG-2026-01-25.md`)
+- Use the current date when creating the changelog
+- This rotation strategy prevents any single changelog file from becoming too large
+- Each file is self-contained and ordered by date
 
 **File Header:** Begin with `# Changelog`
 
