@@ -1,5 +1,196 @@
 # Changelog
 
+## PR #15: Comprehensive LiveKit Deployment Guide (January 24, 2026)
+
+**Commit:** c7a4df4
+**Branch:** `implement-critical-tests`
+**Files changed:** 6 files (+1,333 lines, -3 lines)
+
+### ✨ New Features
+
+#### DEPLOYMENT.md - Complete Deployment Guide
+- **Comprehensive deployment documentation** - Step-by-step guide for deploying to LiveKit Cloud
+  - Prerequisites and environment setup (dev/staging/prod)
+  - Authentication with LiveKit Cloud
+  - Initial deployment process (2-5 minutes for first build)
+  - Secrets management with encryption
+  - Monitoring and troubleshooting guides
+  - CLI command reference
+  - Advanced configuration options
+  - Implemented in `DEPLOYMENT.md` (1,286 lines)
+
+#### Frontend Connection Options
+- **LiveKit Agents Playground** - Zero-setup testing tool
+  - URL: https://agents-playground.livekit.io/
+  - Instant agent testing without any code
+  - Audio visualization and agent state indicators
+  - Perfect for quick validation after deployments
+
+- **LiveKit Meet** - Video conferencing with agents
+  - URL: https://meet.livekit.io/
+  - Multi-user conference scenarios
+  - Test agents alongside human participants
+  - Full video conferencing interface
+  - Room token generation via CLI
+
+- **Web Frontend (React/Next.js)** - Production web app
+  - Starter repository: agent-starter-react
+  - `useVoiceAssistant` React hook
+  - Audio visualizer component
+  - Token generation via API routes
+  - Next.js 14+ App Router
+
+- **iOS/macOS (Swift)** - Native Apple platforms
+  - Starter repository: agent-starter-swift
+  - SwiftUI interface
+  - AgentBarAudioVisualizer component
+  - Sandbox token endpoint support
+  - Background audio support
+
+- **Flutter (Cross-Platform)** - Multi-platform development
+  - Starter repository: agent-starter-flutter
+  - iOS, Android, web, desktop support
+  - SoundWaveformWidget visualization
+  - Hot reload for rapid development
+
+- **Web Embed Widget** - Embeddable interface
+  - Starter repository: agent-starter-embed
+  - Minimal integration code
+  - Customizable appearance
+  - No build step required for host website
+
+#### Connection Flow Optimization
+- **Standard flow** - 3-5 second connection time
+  - Token fetch → User connect → Agent dispatch → Media flow
+
+- **Optimized flow** - <1 second connection time
+  - Pre-generate tokens (warm token approach)
+  - Concurrent dispatch (parallel operations)
+  - Connection state monitoring
+  - Responsiveness enhancements (sound effects, haptics, visual feedback)
+
+#### Production Token Server
+- **Secure token generation** - Node.js/Next.js example
+  - AccessToken with LiveKit Server SDK
+  - Room grants and permissions
+  - 2-hour token validity
+  - Ready for production deployment
+
+### 📚 Documentation Updates
+
+#### AGENTS.md Enhancements
+- **Git operations policy** - NO Claude attribution requirements
+  - Never add "Co-Authored-By: Claude" to commits
+  - Never add "Generated with Claude" to PRs
+  - Commits must appear as user-authored only
+  - PR descriptions should be professional and attribution-free
+  - Added 34 lines of git policy documentation
+
+- **Testing skill guidance** - Reference to `/writing-tests` skill
+  - When to use the skill for test writing
+  - Testing Trophy model with real dependencies
+  - Behavior-focused test strategies
+  - Anti-pattern avoidance
+  - Added 8 lines of testing guidance
+
+#### PR Description Commands
+- **No AI attribution enforcement** - Updated three commands
+  - `.claude/commands/ci_describe_pr.md` - Added attribution policy
+  - `.claude/commands/commit-push-pr.md` - Added critical requirements
+  - `.claude/commands/describe_pr.md` - Added attribution policy
+  - Ensures all PRs are user-attributed only
+
+### ⚙️ Configuration
+
+#### Settings Updates
+- **WebFetch permission** - `.claude/settings.local.json`
+  - Added `WebFetch(domain:docs.livekit.io)` permission
+  - Enables documentation research for deployment guides
+  - Supports LiveKit docs integration
+
+### 🔧 Technical Details
+
+#### DEPLOYMENT.md Structure
+- **Table of Contents** - Complete navigation with 42 linked sections
+  - Hierarchical organization (sections and subsections)
+  - Working markdown anchor links
+  - Easy navigation throughout 1,286 lines
+
+#### Deployment Workflow
+1. **Prerequisites** - CLI installation, Cloud account, API keys
+2. **Environment Strategy** - Separate dev/staging/prod projects
+3. **Initial Setup** - Authentication and project configuration
+4. **Deployment** - Create command with secrets injection
+5. **Verification** - Status checks and log monitoring
+6. **Testing** - Multiple frontend options for connection
+7. **Updates** - Code changes, secrets, and rollbacks
+8. **Monitoring** - Real-time logs, status dashboard, health checks
+
+#### Key Features
+- **Secrets management** - Three methods (file, individual, mount)
+  - Encrypted storage in LiveKit Cloud
+  - Rolling restarts on updates (no downtime)
+  - 1-hour grace period for active sessions
+
+- **Rolling deployment** - Zero-downtime updates
+  - New instances serve new sessions
+  - Old instances continue for up to 1 hour
+  - Instant rollback available (paid plans)
+
+- **Monitoring tools** - Comprehensive observability
+  - Real-time log streaming (`lk agent logs --follow`)
+  - Agent status dashboard (`lk agent status`)
+  - Build logs for troubleshooting
+  - Version history for rollbacks
+
+#### Common Issues and Solutions
+- **Build Failed** - Dockerfile errors, missing dependencies
+- **CrashLoop** - Runtime errors, missing secrets
+- **Agent Not Receiving Sessions** - Credential mismatches
+- **High Latency** - Region selection, API performance
+
+### Files Modified
+
+#### Documentation (3 files, +1,319 lines)
+- `DEPLOYMENT.md` - New comprehensive deployment guide (1,286 lines)
+- `AGENTS.md` - Git attribution policy and testing guidance (+33 lines)
+
+#### Commands (3 files, +3 lines)
+- `.claude/commands/ci_describe_pr.md` - Added attribution policy (+1 line)
+- `.claude/commands/commit-push-pr.md` - Added critical requirements (+1 line)
+- `.claude/commands/describe_pr.md` - Added attribution policy (+1 line)
+
+#### Configuration (1 file, +1 line)
+- `.claude/settings.local.json` - Added WebFetch permission
+
+### Migration Notes
+
+This release provides complete deployment documentation for LiveKit Cloud:
+
+#### Key Benefits
+- **Zero to production** - Complete guide from setup to deployment
+- **Multiple frontend options** - Web, iOS, Flutter, embed, and testing tools
+- **Production-ready** - Secrets management, monitoring, troubleshooting
+- **User-friendly** - Clear examples, common workflows, CLI reference
+- **Quick testing** - Agents Playground and Meet for instant validation
+
+#### Quick Start Path
+1. Authenticate: `lk cloud auth`
+2. Deploy: `lk agent create --secrets-file .env.local` (2-5 minutes)
+3. Test: Visit https://agents-playground.livekit.io/ with project credentials
+4. Monitor: `lk agent logs --follow`
+
+#### Design Philosophy
+- **Importance-first ordering** - Playground and Meet first for quickest testing
+- **Clear navigation** - Complete TOC with working anchor links
+- **Practical examples** - Real commands, not abstract concepts
+- **Progressive complexity** - Simple testing → Production deployment
+- **Optimization guidance** - Connection flow improvements
+
+The deployment guide streamlines the path from local development to production, with clear documentation for every step and multiple frontend options for different use cases.
+
+---
+
 ## PR #15: Critical Test Coverage Implementation (January 24, 2026)
 
 **Commit:** c09469f
