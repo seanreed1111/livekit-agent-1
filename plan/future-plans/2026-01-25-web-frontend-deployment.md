@@ -32,6 +32,8 @@ This plan enables potential clients to interact with the LiveKit voice AI agent 
 
 The solution uses LiveKit's official starter templates and SDKs to create a production-ready web application with TypeScript/JavaScript.
 
+**IMPORTANT: This is an audio-only application. No video camera or screen sharing permissions should be requested from users. All configuration must disable video/screenshare features.**
+
 ## Current State Analysis
 
 ### What Exists Now
@@ -945,15 +947,18 @@ AGENT_NAME=agent_abc123
 # Uses specific agent by ID or name
 ```
 
-**Check Token Grant Configuration:**
+**Check Token Grant Configuration (Audio-Only):**
 ```typescript
 // In app/api/token/route.ts or connection-details/route.ts
 token.addGrant({
   room: roomName,
   roomJoin: true,
-  canPublish: true,
-  canSubscribe: true,
-  // Optional: Agent dispatch configuration
+  canPublish: true,      // Allow publishing audio
+  canSubscribe: true,    // Allow receiving audio
+  canPublishSources: [   // AUDIO-ONLY: restrict to microphone
+    'microphone'
+    // NOTE: 'camera' and 'screen_share' are NOT included
+  ],
 });
 ```
 
@@ -1433,10 +1438,10 @@ export const APP_CONFIG_DEFAULTS = {
   // Accent color
   accentColor: "#4F46E5", // Change to your brand color (hex)
 
-  // Feature toggles
-  supportsChatInput: true, // Allow text chat alongside voice
-  supportsVideoInput: true, // Enable camera video
-  supportsScreenShare: true, // Enable screen sharing
+  // Feature toggles - AUDIO-ONLY CONFIGURATION
+  supportsChatInput: false, // Disable text chat (audio-only)
+  supportsVideoInput: false, // DISABLE camera video (audio-only)
+  supportsScreenShare: false, // DISABLE screen sharing (audio-only)
   isPreConnectBufferEnabled: true, // Pre-load for faster connection
 
   // Optional: Agent configuration
@@ -1444,16 +1449,16 @@ export const APP_CONFIG_DEFAULTS = {
 };
 ```
 
-**Example Customization:**
+**Example Customization (Audio-Only):**
 ```typescript
 export const APP_CONFIG_DEFAULTS = {
   companyName: "Acme Voice AI",
   pageTitle: "Voice AI Assistant | Acme Corp",
   logoUrl: "/acme-logo.svg",
   accentColor: "#FF6B35", // Orange
-  supportsChatInput: true,
-  supportsVideoInput: false, // Disable video for voice-only
-  supportsScreenShare: false,
+  supportsChatInput: false, // Audio-only: no text chat
+  supportsVideoInput: false, // Audio-only: no camera
+  supportsScreenShare: false, // Audio-only: no screen share
   isPreConnectBufferEnabled: true,
 };
 ```
@@ -1639,19 +1644,19 @@ Create `og-image.png` (1200x630px) for social media previews.
 
 ---
 
-#### 5.6: Optional - Disable Features Not Needed
+#### 5.6: Configure Audio-Only Mode (REQUIRED)
 
-**What:** Hide video/screen share features if you only need voice
+**What:** Disable video/screen share features for audio-only application
 
 **File:** `frontend/voice-ai-frontend/app-config.ts`
 
-**For Voice-Only App:**
+**REQUIRED Configuration for Audio-Only App:**
 ```typescript
 export const APP_CONFIG_DEFAULTS = {
   // ... other settings
-  supportsChatInput: false, // Disable text chat
-  supportsVideoInput: false, // Disable camera
-  supportsScreenShare: false, // Disable screen sharing
+  supportsChatInput: false, // Audio-only: disable text chat
+  supportsVideoInput: false, // REQUIRED: disable camera
+  supportsScreenShare: false, // REQUIRED: disable screen sharing
   isPreConnectBufferEnabled: true, // Keep for faster connection
 };
 ```
@@ -1660,9 +1665,12 @@ export const APP_CONFIG_DEFAULTS = {
 - Video camera icon hidden
 - Screen share button removed
 - UI simplified to voice-only interface
-- Reduced complexity for users
+- No video/screenshare permission requests to users
+- Browser only requests microphone permission
 
-**Rationale:** Simplify UI by removing unused features
+**IMPORTANT:** This is a required configuration for this audio-only application. Do NOT enable video or screen sharing features.
+
+**Rationale:** This application is designed for audio-only interaction. No video capabilities should be exposed to users.
 
 ---
 
@@ -1677,7 +1685,8 @@ export const APP_CONFIG_DEFAULTS = {
 - [ ] Custom favicon appears in browser tab
 - [ ] Brand colors visible on buttons and accents
 - [ ] Welcome message updated with custom text
-- [ ] Disabled features are hidden (if applicable)
+- [ ] Video/screenshare features are hidden (REQUIRED for audio-only)
+- [ ] Only microphone permission requested (no camera/screenshare)
 - [ ] No broken images or 404s
 - [ ] Responsive design maintained on mobile
 
@@ -1710,7 +1719,8 @@ export const APP_CONFIG_DEFAULTS = {
 - [ ] Favicon visible in browser tab
 - [ ] Brand colors applied throughout UI
 - [ ] Welcome message updated
-- [ ] Unused features hidden (if disabled)
+- [ ] Video/screenshare features are hidden (REQUIRED - verify no camera/screenshare icons)
+- [ ] Browser only requests microphone permission (NOT camera)
 - [ ] Mobile responsive (test at 375px width)
 - [ ] No console errors or warnings
 - [ ] All images load correctly (no broken images)
@@ -1952,9 +1962,11 @@ Your project is now live at: https://your-app.vercel.app
    - [ ] Page loads without errors
    - [ ] Custom branding displays correctly
    - [ ] Click "Connect" button
-   - [ ] Grant microphone permissions
+   - [ ] Verify ONLY microphone permission requested (no camera/screenshare)
+   - [ ] Grant microphone permission
    - [ ] Speak to agent
    - [ ] Verify agent responds with voice
+   - [ ] Confirm no video/screenshare UI elements visible
    - [ ] Test on mobile device
    - [ ] Test in different browsers
 

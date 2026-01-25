@@ -15,6 +15,8 @@ LiveKit provides multiple JavaScript/TypeScript solutions for building web front
 - Audio visualization and agent state tracking
 - Automatic agent dispatch when users connect
 
+**IMPORTANT: This deployment is for an AUDIO-ONLY application. All video camera and screen sharing features must be disabled. Only microphone permissions should be requested from users.**
+
 **Timeline:** 6-8 hours for complete deployment (agent + frontend + customization)
 **Cost:** $0.01 per agent session minute (LiveKit Cloud) + Free (Vercel frontend hosting)
 
@@ -40,11 +42,13 @@ Official Next.js/React template from LiveKit with production-ready voice AI inte
 ✓ Token generation API route (`/api/token`)
 ✓ `useVoiceAssistant` React hook for agent state
 ✓ Audio visualizer (`BarVisualizer`)
-✓ Camera video and screen sharing support
+✓ Audio-only interface (video and screen sharing disabled)
 ✓ Light/dark theme with system preference
 ✓ Customizable branding via `app-config.ts`
 ✓ Mobile-responsive design
 ✓ Production-ready architecture
+
+**IMPORTANT: This is an audio-only application. Video camera and screen sharing features should be disabled in configuration.**
 
 ### Setup Process
 ```bash
@@ -432,18 +436,18 @@ NEXT_PUBLIC_LIVEKIT_URL=wss://your-project.livekit.cloud
 
 ### Token Permissions
 
-**Recommended Grants:**
+**Recommended Grants (Audio-Only):**
 ```typescript
 token.addGrant({
   room: roomName,              // Specific room
   roomJoin: true,              // Can join
-  canPublish: true,            // Can publish audio/video
-  canSubscribe: true,          // Can receive audio/video
+  canPublish: true,            // Can publish audio
+  canSubscribe: true,          // Can receive audio
   canPublishData: true,        // Can send data messages
-  canPublishSources: [         // Optional: restrict sources
-    'microphone',
-    'camera',
-    'screen_share'
+  canPublishSources: [         // Audio-only: restrict to microphone only
+    'microphone'
+    // NOTE: 'camera' and 'screen_share' are NOT included
+    // This is an audio-only application
   ],
 });
 ```
