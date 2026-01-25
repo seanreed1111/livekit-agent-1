@@ -112,12 +112,6 @@ After getting initial clarifications:
    - **codebase-analyzer** - To understand implementation details (e.g., "analyze how [system] works")
    - **codebase-pattern-finder** - To find similar features we can model after
 
-   **For historical context:**
-   - **thoughts-locator** - To find any research, plans, or decisions about this area
-   - **thoughts-analyzer** - To extract key insights from the most relevant documents
-
-   **For related tickets:**
-   - **linear-searcher** - To find similar issues or past implementations
 
    Each agent knows how to:
    - Find the right files and code patterns
@@ -126,9 +120,9 @@ After getting initial clarifications:
    - Return specific file:line references
    - Find tests and examples
 
-3. **Wait for ALL sub-tasks to complete** before proceeding
+4. **Wait for ALL sub-tasks to complete** before proceeding
 
-4. **Present findings and design options**:
+5. **Present findings and design options**:
    ```
    Based on my research, here's what I found:
 
