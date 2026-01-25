@@ -93,7 +93,8 @@ guidelines from CHANGELOG_STYLE.md
 - Specify date ranges for focused changelogs
 - Use your CHANGELOG_STYLE.md for consistent formatting
 - Review and adjust the generated changelog before publishing
-- Save output directly to CHANGELOG.md
+- Save output to `docs/changelog/CHANGELOG-YYYY-MM-DD.md` (using the current date)
+- Rotated changelog files prevent any single file from becoming too large
 
 ## Related Use Cases
 
