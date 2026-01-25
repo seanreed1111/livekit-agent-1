@@ -44,7 +44,8 @@
       "Bash(docker build:*)",
       "Bash(gh pr merge:*)",
       "Bash(git pull:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:docs.livekit.io)"
     ]
   }
 }

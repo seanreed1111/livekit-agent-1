@@ -21,10 +21,15 @@ Based on the above changes:
 
 ### Phase 1: Create PR (single message)
 1. Create a new branch if on main
-2. Create a single commit with an appropriate message
+2. Create a single commit with an appropriate message (NO Claude attribution)
 3. Push the branch to origin
-4. Create a pull request using `gh pr create`
+4. Create a pull request using `gh pr create` (NO Claude attribution in PR body)
 5. You have the capability to call multiple tools in a single response. You MUST do all of the above in a single message.
+
+**IMPORTANT:**
+- Do NOT add "Co-Authored-By: Claude" to commits
+- Do NOT add "🤖 Generated with Claude Code" or similar to PR descriptions
+- All commits and PRs should appear as user-authored only
 
 ### Phase 2: Update changelog (conditional - see CRITICAL note above)
 **ONLY if changes include files OTHER than CHANGELOG.md:**
